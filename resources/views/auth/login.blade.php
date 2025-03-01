@@ -25,65 +25,36 @@
                                 @endif
 
                                 <form method="POST" action="{{ route('login') }}" class="user">
-                                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
-
+                                    @csrf
+                                
                                     <div class="form-group">
-                                        <input type="email" class="form-control form-control-user" name="email" placeholder="{{ __('E-Mail Address') }}" value="{{ old('email') }}" required autofocus>
+                                        <input type="text" class="form-control" name="username" placeholder="Username or E-Mail Address" value="{{ old('username') }}" required autofocus>
                                     </div>
-
+                                
                                     <div class="form-group">
-                                        <input type="password" class="form-control form-control-user" name="password" placeholder="{{ __('Password') }}" required>
+                                        <input type="password" class="form-control" name="password" placeholder="Password" required>
                                     </div>
-
+                                
+                                    <div class="form-group">
+                                        <select name="database" id="database" class="form-control" required>
+                                            <option value="" disabled selected>Select Database</option>
+                                            <option value="SIMULASI_NEW_UD">SIMULASI NEW UD</option>
+                                        </select>
+                                    </div>
+                                
                                     <div class="form-group">
                                         <div class="custom-control custom-checkbox small">
                                             <input type="checkbox" class="custom-control-input" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
-                                            <label class="custom-control-label" for="remember">{{ __('Remember Me') }}</label>
+                                            <label class="custom-control-label" for="remember">Remember Me</label>
                                         </div>
                                     </div>
-
+                                
                                     <div class="form-group">
                                         <button type="submit" class="btn btn-primary btn-user btn-block">
-                                            {{ __('Login') }}
+                                            Login
                                         </button>
                                     </div>
-
-                                    <hr>
-
-                                    <div class="form-group">
-                                        <button type="button" class="btn btn-github btn-user btn-block">
-                                            <i class="fab fa-github fa-fw"></i> {{ __('Login with GitHub') }}
-                                        </button>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <button type="button" class="btn btn-twitter btn-user btn-block">
-                                            <i class="fab fa-twitter fa-fw"></i> {{ __('Login with Twitter') }}
-                                        </button>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <button type="button" class="btn btn-facebook btn-user btn-block">
-                                            <i class="fab fa-facebook-f fa-fw"></i> {{ __('Login with Facebook') }}
-                                        </button>
-                                    </div>
-                                </form>
-
-                                <hr>
-
-                                @if (Route::has('password.request'))
-                                    <div class="text-center">
-                                        <a class="small" href="{{ route('password.request') }}">
-                                            {{ __('Forgot Password?') }}
-                                        </a>
-                                    </div>
-                                @endif
-
-                                @if (Route::has('register'))
-                                    <div class="text-center">
-                                        <a class="small" href="{{ route('register') }}">{{ __('Create an Account!') }}</a>
-                                    </div>
-                                @endif
+                                </form>                                
                             </div>
                         </div>
                     </div>
