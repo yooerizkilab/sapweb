@@ -536,3 +536,12 @@
 #48 C:\\laragon\\www\\sapweb\\server.php(21): require_once('C:\\\\laragon\\\\www\\\\...')
 #49 {main}
 "} 
+[2025-03-01 14:35:03] local.ERROR: Command "migartion" is not defined. {"exception":"[object] (Symfony\\Component\\Console\\Exception\\CommandNotFoundException(code: 0): Command \"migartion\" is not defined. at C:\\laragon\\www\\sapweb\\vendor\\symfony\\console\\Application.php:725)
+[stacktrace]
+#0 C:\\laragon\\www\\sapweb\\vendor\\symfony\\console\\Application.php(262): Symfony\\Component\\Console\\Application->find('migartion')
+#1 C:\\laragon\\www\\sapweb\\vendor\\symfony\\console\\Application.php(174): Symfony\\Component\\Console\\Application->doRun(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#2 C:\\laragon\\www\\sapweb\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(201): Symfony\\Component\\Console\\Application->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#3 C:\\laragon\\www\\sapweb\\artisan(37): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#4 {main}
+"} 
+[2025-03-01 14:36:09] local.ERROR: SAP Login General Exception {"message":"cURL error 28: Failed to connect to 172.16.226.2 port 50000: Timed out (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for https://172.16.226.2:50000/b1s/v1/Login","code":0} 

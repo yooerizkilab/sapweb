@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers\Auth;
 
+use Illuminate\Http\Request;
+use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
 use App\Services\SAPServices;
-use Illuminate\Foundation\Auth\AuthenticatesUsers;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\ValidationException;
 use App\Models\User;
-use Illuminate\Support\Facades\Log;
 
 class LoginController extends Controller
 {
@@ -98,7 +99,17 @@ class LoginController extends Controller
         if (Auth::attempt($request->only($this->username(), 'password'), $request->filled('remember'))) {
             $database = $request->input('database');
 
-            // Login ke SAP
+            // Hapus session lama jika user berpindah database
+            $oldCompanyDB = session('sap_company_db');
+            if ($oldCompanyDB && $oldCompanyDB !== $database) {
+                app(SAPServices::class)->logout(); // Logout session lama
+                Cache::forget('sap_session_' . Auth::id() . '_' . $oldCompanyDB);
+            }
+
+            // Simpan database baru ke session
+            session(['sap_company_db' => $database]);
+
+            // Login ke SAP dengan database baru
             $sapService = app(SAPServices::class);
             $loginResult = $sapService->login($database);
 
@@ -108,11 +119,9 @@ class LoginController extends Controller
 
             // Jika login SAP gagal, logout dari Laravel
             Auth::logout();
+            session()->forget('sap_company_db');
 
-            // Pastikan $loginResult adalah string
-            $errorMessage = is_string($loginResult) ? $loginResult : 'Login ke SAP gagal, silakan coba lagi.';
-
-            return back()->withErrors(['sap' => $errorMessage]);
+            return back()->withErrors(['sap' => 'Login ke SAP gagal, silakan coba lagi.']);
         }
 
         return $this->sendFailedLoginResponse($request);
@@ -126,22 +135,24 @@ class LoginController extends Controller
      */
     public function logout(Request $request)
     {
-        if (session()->has('sap_session_id')) {
-            try {
-                app(SAPServices::class)->logout();
-            } catch (\Exception $e) {
-                // Log the error but continue with logout
-                Log::error('SAP logout error: ' . $e->getMessage());
+        $companyDB = session('sap_company_db'); // Ambil database aktif dari session
+        $cacheKey = 'sap_session_' . auth()->id() . '_' . $companyDB;
+
+        try {
+            if ($companyDB && Cache::has($cacheKey)) {
+                app(SAPServices::class)->logout(); // Logout dari SAP
+                Cache::forget($cacheKey); // Hapus session SAP di cache
             }
+        } catch (\Exception $e) {
+            Log::error('SAP logout error: ' . $e->getMessage());
         }
 
-        // Hapus session SAP & database
-        session()->forget(['sap_session_id']);
-
-        $this->guard()->logout();
+        // Hapus semua session Laravel
+        session()->forget('sap_company_db');
+        Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return redirect('/login')->with('status', 'You have been logged out.');
     }
 }
