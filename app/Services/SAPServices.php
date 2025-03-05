@@ -158,8 +158,17 @@ class SAPServices
     // Fungsi GET by ID
     public function getById(string $endpoint, string $id, array $parameters = [])
     {
-        return $this->handleRequest(function () use ($endpoint, $id, $parameters) {
-            return $this->client->get("$endpoint('$id')", [
+        // Validasi input
+        if (!is_scalar($id)) {
+            throw new \InvalidArgumentException('ID harus berupa string atau integer');
+        }
+
+        $formattedId = is_numeric($id)
+            ? $id  // Untuk ID numerik, gunakan langsung
+            : "'" . $id . "'";  // Untuk ID string, bungkus dengan single quote
+
+        return $this->handleRequest(function () use ($endpoint, $formattedId, $parameters) {
+            return $this->client->get($endpoint . "(" . $formattedId . ")", [
                 'headers' => $this->getDefaultHeaders(),
                 'query' => $parameters
             ]);
