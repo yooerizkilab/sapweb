@@ -69,15 +69,22 @@ class BusinessPartnerMasterController extends Controller
             ];
             $businessGroups = $this->sapService->getById('BusinessPartnerGroups', $businessPartners['GroupCode'], $paramsBussinesGroups);
             $paramsSales = [
-                // '$select'  => 'Name'
+                '$select' => 'SalesEmployeeName,Telephone'
             ];
-            $businessSales = $this->sapService->getById('BusinessPartnerSales', $businessPartners['SalesPersonCode'], $paramsSales);
+            $businessSales = $this->sapService->getById('SalesPersons', $businessPartners['SalesPersonCode'], $paramsSales);
             $paramsPaymentTerms = [
-                // '$select'  => 'PaymentTermsGroupName',
+                '$select'  => 'GroupNumber,PaymentTermsGroupName',
             ];
             $businessPaymentTermsTypes = $this->sapService->getById('PaymentTermsTypes', $businessPartners['PayTermsGrpCode'], $paramsPaymentTerms);
-            // return $businessPartners;
-            return view('business-partner.business-master.show', compact('businessPartners', 'businessGroups', 'businessSales', 'businessPaymentTermsTypes'));
+            $paramsCountry = [
+                '$select' => 'Name'
+            ];
+            $countries = $this->sapService->getById('Countries', $businessPartners['Country'], $paramsCountry);
+            $paramsStates = [
+                '$select' => 'Name'
+            ];
+            $states = $this->sapService->getById('States', $businessPartners['Country'], $paramsStates);
+            return view('business-partner.business-master.show', compact('businessPartners', 'businessGroups', 'businessSales', 'businessPaymentTermsTypes', 'countries', 'states'));
         } catch (\Exception $e) {
             return $e->getMessage();
         }

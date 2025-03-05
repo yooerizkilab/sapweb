@@ -11,7 +11,7 @@
 <div class="card shadow mb-4">
     <div class="card-header py-3 d-flex justify-content-between align-items-center flex-wrap">
         <h4 class="m-0 font-weight-bold text-primary">Detail Bussines Master</h4>
-        <a href="{{ route('business-master.create') }}" class="btn btn-primary btn-md mr-2">
+        <a href="{{ route('business-master.index') }}" class="btn btn-primary btn-md mr-2">
             <i class="fas fa-reply"></i> 
             Back
         </a>
@@ -35,15 +35,15 @@
                     </tr>
                     <tr>
                         <td>Group</td>
-                        <td>: {{ $businessGroups['Name'] }}</td>
+                        <td>: {{ $businessGroups['Name'] ?? ' ' }}</td>
                     </tr>
                     <tr>
                         <td>Curency</td>
-                        <td>: {{ $businessPartners['Currency'] }}</td>
+                        <td>: {{ $businessPartners['Currency'] ?? ' ' }}</td>
                     </tr>
                     <tr>
                         <td>Federal Tax ID</td>
-                        <td>: {{ $businessPartners['FederalTaxID'] }}</td>
+                        <td>: {{ $businessPartners['FederalTaxID'] ?? ' ' }}</td>
                     </tr>
                 </table>
             </div>
@@ -52,19 +52,19 @@
                 <table class="table table-borderless">
                     <tr>
                         <td>Account Balance</td>
-                        <td>: </td>
+                        <td>: Rp {{ number_format($businessPartners['CurrentAccountBalance'], 2) }}</td>
                     </tr>
                     <tr>
                         <td>Deliveries</td>
-                        <td>: </td>
+                        <td>: Rp {{ number_format($businessPartners['OpenDeliveryNotesBalance'], 2) }}</td>
                     </tr>
                     <tr>
                         <td>Orders</td>
-                        <td>: </td>
+                        <td>: Rp {{ number_format($businessPartners['OpenOrdersBalance'], 2) }}</td>
                     </tr>
                     <tr>
                         <td>Opportunities</td>
-                        <td>: </td>
+                        <td>: {{ $businessPartners['OpenOpportunities'] ?? ' ' }}</td>
                     </tr>
                 </table>
             </div>
@@ -101,32 +101,269 @@
                     </li>
                 </ul>
                 <div class="tab-content" id="businessPartnerTabContent">
+                    
+                    <!-- General -->
                     <div class="tab-pane fade show active" id="general" role="tabpanel">
-                        <div class="row">
-                            <h5 class="font-weight-bold text-primary">General Informastion</h5>
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <h5 class="font-weight-bold text-primary text-center">General Information</h5>
+                            </div>
+                            <div class="col-md-6">
+                                <table class="table table-borderless">
+                                    <tr>
+                                        <td>Tel 1</td>
+                                        <td>: {{ $businessPartners['Phone1'] ?? ' ' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Tel 2</td>
+                                        <td>: {{ $businessPartners['Phone2'] ?? ' ' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Mobile Phone</td>
+                                        <td>: {{ $businessPartners['Cellular'] ?? ' ' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Fax</td>
+                                        <td>: {{ $businessPartners['Fax'] ?? ' ' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>E-Mail</td>
+                                        <td>: {{ $businessPartners['E_Mail'] ?? ' ' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Website</td>
+                                        <td>: {{ $businessPartners['WebSite'] ?? ' ' }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-md-6">
+                                <table class="table table-borderless">
+                                    <tr>
+                                        <td>Contact Person</td>
+                                        <td>: {{ $businessPartners['ContactPerson'] ?? ' ' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Unifiled Tax ID</td>
+                                        <td>: {{ $businessPartners['UnifiedFederalTaxID'] ?? ' ' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Remarks</td>
+                                        <td>: {{ $businessPartners['Notes'] ?? ' ' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Sales Employee</td>
+                                        <td>: {{ $businessSales['SalesEmployeeName'] ?? ' ' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Sales Phone</td>
+                                        <td>: {{ $businessSales['Telephone'] ?? ' ' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Status</td>
+                                        <td>: {!! isset($businessPartners['ContactEmployees'][0]['Active']) && $businessPartners['ContactEmployees'][0]['Active'] == 'tYES' 
+                                            ? '<span class="badge badge-success">Active</span>' 
+                                            : '<span class="badge badge-danger">Inactive</span>' !!}
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
                         </div>
                     </div>
+
+                    <!-- Contact -->
                     <div class="tab-pane fade" id="contact" role="tabpanel">
-                        
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <h5 class="font-weight-bold text-primary text-center">Contact Information</h5>
+                            </div>
+                            <div class="col-md-6">
+                                <table class="table table-borderless">
+                                    <tr>
+                                        <td>Contact ID</td>
+                                        <td>: </td>
+                                    </tr>
+                                    <tr>
+                                        <td>First Name</td>
+                                        <td>: </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Middle Name</td>
+                                        <td>: </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Last Name</td>
+                                        <td>: </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Job Title</td>
+                                        <td>: </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Address</td>
+                                        <td>: </td>
+                                    </tr>
+                                    <tr>
+                                        <td>City</td>
+                                        <td>: </td>
+                                    </tr>
+                                    <tr>
+                                        <td>State</td>
+                                        <td>: </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Country</td>
+                                        <td>: </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Postal Code</td>
+                                        <td>: </td>
+                                    </tr>
+                                    <tr>
+                                        <td>MobilePhone</td>
+                                        <td>: </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
                     </div>
+
+                    <!-- Addresses -->
                     <div class="tab-pane fade" id="addresess" role="tabpanel">
-                        
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <h5 class="font-weight-bold text-primary text-center">Addresses Information</h5>
+                            </div>
+
+                            @foreach ($businessPartners['BPAddresses'] ?? [] as $index => $address)
+                                <div class="col-md-5">
+                                    <h5 class="font-weight-bold text-primary text-center">{{ $address['AddressName'] }}</h5>
+                                    <table class="table table-borderless">
+                                        <tr>
+                                            <td>Country</td>
+                                            <td>: {{ $countries['Name'] }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>State</td>
+                                            <td>: {{ $states['Name'] }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>City</td>
+                                            <td>: {{ $address['City'] }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>County</td>
+                                            <td>: {{ $address['County'] }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Street</td>
+                                            <td>: {{ $address['Street'] }}</td>
+                                        </tr>
+                                    </table>
+                                </div>
+
+                                @if ($index == 0 && count($businessPartners['BPAddresses'] ?? []) > 1)
+                                    <div class="col-md-2 text-center">
+                                        <i class="fas fa-arrow-right text-primary fa-3x"></i>
+                                    </div>
+                                @endif
+                            @endforeach
+                        </div>
                     </div>
+
+                    <!-- Payment Terms -->
                     <div class="tab-pane fade" id="payment" role="tabpanel">
-                        
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <h5 class="font-weight-bold text-primary text-center">Payment Terms Information</h5>
+                            </div>
+                            <div class="col-md-6">
+                                <table class="table table-borderless">
+                                    <tr>
+                                        <td>Payment Terms</td>
+                                        <td>: {{ $businessPaymentTermsTypes['PaymentTermsGroupName'] ?? ' ' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Price Mode</td>
+                                        <td>: {{ $businessPartners['PriceMode'] == 'pmNet' ? 'Net' : 'Gross' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Price List</td>
+                                        <td>: {{ $businessPartners['PriceListNum'] ?? ' ' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Total Discount%</td>
+                                        <td>: {{ $businessPartners['DiscountPercent'] ?? ' ' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Credit Limit</td>
+                                        <td>: Rp {{ number_format($businessPartners['CreditLimit'], 2) }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Commitment Limit</td>
+                                        <td>: Rp {{ number_format($businessPartners['MaxCommitment'], 2) }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-md-6">
+                                <table class="table table-borderless">
+                                    <tr>
+                                        <td>Credit Card Type</td>
+                                        <td>: </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Credit Card No</td>
+                                        <td>: </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
                     </div>
+
+                    <!-- Payment Run -->
                     <div class="tab-pane fade" id="payment-run" role="tabpanel">
                         
                     </div>
+
+                    <!-- Accounting -->
                     <div class="tab-pane fade" id="accounting" role="tabpanel">
-                        
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <h5 class="font-weight-bold text-primary text-center">Accounting Information</h5>
+                            </div>
+                            <div class="col-md-6">
+                                <table class="table table-borderless">
+                                    <tr>
+                                        <td>Payment Consolidation</td>
+                                        <td>: </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Account Receivable</td>
+                                        <td>: </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Down Payment Clearing Account</td>
+                                        <td>: </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Afiliate</td>
+                                        <td>: </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>  
                     </div>
+
+                    <!-- Properties -->
                     <div class="tab-pane fade" id="propertiess" role="tabpanel">
                         
                     </div>
+
+                    <!-- Remarks -->
                     <div class="tab-pane fade" id="remarks" role="tabpanel">
                         
                     </div>
+
+                    <!-- Attachments -->
                     <div class="tab-pane fade" id="attachments" role="tabpanel">
                         
                     </div>

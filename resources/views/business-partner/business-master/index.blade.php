@@ -34,7 +34,7 @@
                         <td class="text-center">{{ $loop->iteration }}</td>
                         <td>{{ $businessPartner['CardCode'] }}</td>
                         <td>{{ $businessPartner['CardName'] }}</td>
-                        <td>{{ $businessPartner['CardType'] == 'cCustomer' ? 'Customer' : 'Supplier' }}</td>
+                        <td class="text-center">{{ $businessPartner['CardType'] == 'cCustomer' ? 'Customer' : 'Supplier' }}</td>
                         <td class="text-center">
                             <div class="d-inline-flex">
                                 <a href="{{ route('business-master.show', $businessPartner['CardCode']) }}" class="btn btn-info btn-circle btn-sm mr-1">
@@ -43,6 +43,13 @@
                                 <a href="{{ route('business-master.edit', $businessPartner['CardCode']) }}" class="btn btn-warning btn-circle btn-sm mr-1">
                                     <i class="fas fa-pencil-alt"></i>
                                 </a>
+                                <form action="{{ route('business-master.destroy', $businessPartner['CardCode']) }}" method="post" id="deleteForm-{{ $businessPartner['CardCode'] }}">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="button" class="btn btn-danger btn-circle btn-sm" onclick="confirmDelete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
                             </div>
                         </td>
                     </tr>
