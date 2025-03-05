@@ -20,8 +20,31 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::group(['middleware' => ['auth', 'sap.session']], function () {
+Route::group(['middleware' => ['auth', 'sap.session'], 'prefix' => 'sap'], function () {
+
     Route::get('/home', 'HomeController@index')->name('home');
+
+    Route::group(['namespace' => 'BusinessPartners', 'prefix' => 'business-partner'], function () {
+        Route::resource('business-master', 'BusinessPartnerMasterController');
+    });
+
+    Route::group(['namespace' => 'Sales', 'prefix' => 'sales'], function () {
+        Route::resource('sales-quotation', 'SalesQuotationController');
+        Route::resource('sales-order', 'SalesOrderController');
+        Route::resource('delivery', 'DeliveryController');
+    });
+
+    Route::group(['prefix' => 'purchasing'], function () {
+        //
+    });
+
+    Route::group(['prefix' => 'inventory'], function () {
+        //
+    });
+
+    Route::group(['prefix' => 'production'], function () {
+        //
+    });
 
     Route::get('/profile', 'ProfileController@index')->name('profile');
     Route::put('/profile', 'ProfileController@update')->name('profile.update');
