@@ -12,6 +12,7 @@ class BusinessPartnerMasterController extends Controller
     * @var $sapService
     */
     protected $sapService;
+
     /*
     * Create a new controller instance.
     */
@@ -20,6 +21,7 @@ class BusinessPartnerMasterController extends Controller
         $this->middleware('auth');
         $this->sapService = $sapService;
     }
+
     /**
      * Display a listing of the resource.
      */
@@ -51,7 +53,69 @@ class BusinessPartnerMasterController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // Validation
+        $request->validate([
+            //
+        ]);
+
+        try {
+            $businessPartners = [
+                'CardType' => $request->CardType,
+                'CardName' => $request->CardName,
+                'GroupCode' => $request->GroupCode,
+                'Cellular' => $request->Cellular,
+                'FederalTaxID' => $request->FederalTaxID,
+                'Address' => $request->Address,
+                'Country' => $request->Country,
+                'State' => $request->State,
+                'City' => $request->City,
+                'County' => $request->County,
+                'Street' => $request->Street,
+                'Notes' => $request->Notes,
+                'SalesPersonCode' => $request->SalesPersonCode,
+                'PayTermsGrpCode' => $request->PayTermsGrpCode,
+                'CreditLimit' => $request->CreditLimit,
+                'MaxCommitment' => $request->MaxCommitment,
+                'Affiliate' => $request->Affiliate,
+                'Series' => '103',
+                'BPAddresses' => [
+                    [
+                        'AddressName' => 'BILL TO',
+                        'AddressType' => 'bo_BillTo',
+                        'Country' => $request->Country,
+                        'State' => $request->State,
+                        'City' => $request->City,
+                        'County' => $request->County,
+                        'Street' => $request->Street
+                    ],
+                    [
+                        'AddressName' => 'SHIP TO',
+                        'AddressType' => 'bo_ShipTo',
+                        'Country' => $request->Country,
+                        'State' => $request->State,
+                        'City' => $request->City,
+                        'County' => $request->County,
+                        'Street' => $request->Street
+                    ]
+                ],
+                'ContactEmployees' => [
+                    [
+                        'Name' => $request->Name,
+                        'FirstName' => $request->FirstName,
+                        'LastName' => $request->LastName,
+                        'MobilePhone' => $request->MobilePhone,
+                        'Email' => $request->Email,
+                        'Position' => $request->Position,
+                        'Address' => $request->Address
+                    ]
+                ]
+            ];
+
+            $businessPartner = $this->sapService->post('BusinessPartners', $businessPartners);
+            return redirect()->back()->with('success', 'Business Partner ' . $businessPartner['CardCode'] . ' created successfully.');
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
     }
 
     /**

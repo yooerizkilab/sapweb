@@ -33,6 +33,81 @@
         </div>
     </li>
 
+    <!-- Nav Item - A/R Sales -->
+    <li class="nav-item {{ request()->routeIs(['sales-quotation.*', 'sales-order.*', 'delivery.*', 'invoice.*']) ? 'active' : '' }}">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseSales"
+            aria-expanded="true" aria-controls="collapseSales">
+            <i class="fas fa-fw fa-cart-plus"></i>
+            <span>A/R Sales</span>
+        </a>
+        <div id="collapseSales" class="collapse {{ request()->routeIs(['sales-quotation.*', 'sales-order.*', 'delivery.*', 'invoice.*']) ? 'show' : '' }}" aria-labelledby="headingSales"
+            data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <a class="collapse-item {{ request()->routeIs('sales-quotation.*') ? 'active' : '' }}" href="{{ route('sales-quotation.index') }}">{{ __('Sales Quotation') }}</a>
+                <a class="collapse-item {{ request()->routeIs('sales-order.*') ? 'active' : '' }}" href="{{ route('sales-order.index') }}">{{ __('Sales Order') }}</a>
+                <a class="collapse-item {{ request()->routeIs('delivery.*') ? 'active' : '' }}" href="{{ route('delivery.index') }}">{{ __('Delivery') }}</a>
+                <a class="collapse-item {{ request()->routeIs('invoice.*') ? 'active' : '' }}" href="{{ route('invoice.index') }}">{{ __('A/R Invoice') }}</a>
+            </div>
+        </div>
+    </li>
+
+    <!-- Nav Item - A/P Purchasing -->
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePurchasing"
+            aria-expanded="true" aria-controls="collapsePurchasing">
+            <i class="fas fa-fw fa-cart-arrow-down"></i>
+            <span>A/P Purchasing</span>
+        </a>
+        <div id="collapsePurchasing" class="collapse" aria-labelledby="headingPurchasing"
+            data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <a class="collapse-item" href="">{{ __('Purchases Request') }}</a>
+            </div>
+        </div>  
+    </li>
+
+    <!-- Nav Item - Inventory -->
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseInventory"
+            aria-expanded="true" aria-controls="collapseInventory">
+            <i class="fas fa-fw fa-truck-loading"></i>
+            <span>Inventory</span>
+        </a>
+        <div id="collapseInventory" class="collapse" 
+            aria-labelledby="headingInventory" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <a class="collapse-item" href="">{{ __('Item Master Data') }}</a>
+                <a class="collapse-item collapsed" href="#" data-toggle="collapse" data-target="#collapseLevel3"
+                    aria-expanded="false" aria-controls="collapseLevel3">
+                    Inventory Transaction
+                </a>
+                <div id="collapseLevel3" class="collapse" 
+                    aria-labelledby="headingLevel3" data-parent="#collapseInventory">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <a class="collapse-item" href="">{{ __('Goods Receipt') }}</a>
+                        <a class="collapse-item" href="">{{ __('Goods Issue') }}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </li>
+
+    <!-- Nav Item - Production -->
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseProduction"
+            aria-expanded="true" aria-controls="collapseProduction">
+            <i class="fas fa-fw fa-industry"></i>
+            <span>Production</span>
+        </a>
+        <div id="collapseProduction" class="collapse" aria-labelledby="headingProduction"
+            data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <a class="collapse-item" href="">{{ __('Bill of Materials') }}</a>
+                <a class="collapse-item" href="">{{ __('Production Order') }}</a>
+            </div>
+        </div>
+    </li>
+
     <!-- Divider -->
     <hr class="sidebar-divider">
 

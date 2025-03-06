@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Services\SAPServices;
 use Illuminate\Http\Request;
 
-class SalesQuotationController extends Controller
+class InvoiceController extends Controller
 {
     /*
     * @var $sapService
@@ -28,13 +28,12 @@ class SalesQuotationController extends Controller
     public function index()
     {
         try {
-            $paramsQuotations = [
+            $paramsInvoices = [
                 '$select' => 'DocEntry,DocNum,DocType,DocDate,CardCode,CardName,DocTotal,DocumentStatus',
                 '$orderby' => 'CreationDate desc'
             ];
-            $quotations = $this->sapService->get('Quotations', $paramsQuotations);
-            // return $quotations;
-            return view('sales.quotation.index', compact('quotations'));
+            $invoices = $this->sapService->get('Invoices', $paramsInvoices);
+            return view('sales.invoice.index', compact('invoices'));
         } catch (\Exception $e) {
             return $e->getMessage();
         }
@@ -45,7 +44,7 @@ class SalesQuotationController extends Controller
      */
     public function create()
     {
-        return view('sales.quotation.create');
+        //
     }
 
     /**
@@ -61,7 +60,7 @@ class SalesQuotationController extends Controller
      */
     public function show(string $id)
     {
-        return view('sales.quotation.show');
+        //
     }
 
     /**
@@ -69,7 +68,7 @@ class SalesQuotationController extends Controller
      */
     public function edit(string $id)
     {
-        return view('sales.quotation.edit');
+        //
     }
 
     /**
@@ -84,30 +83,6 @@ class SalesQuotationController extends Controller
      * Remove the specified resource from storage.
      */
     public function destroy(string $id)
-    {
-        //
-    }
-
-    /**
-     * Close the specified resource.
-     */
-    public function close(string $id)
-    {
-        //
-    }
-
-    /**
-     * Cancel the specified resource.
-     */
-    public function cancel(string $id)
-    {
-        //
-    }
-
-    /**
-     * Download the specified resource.
-     */
-    public function downloadPDF(string $id)
     {
         //
     }

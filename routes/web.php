@@ -32,6 +32,7 @@ Route::group(['middleware' => ['auth', 'sap.session'], 'prefix' => 'sap'], funct
         Route::resource('sales-quotation', 'SalesQuotationController');
         Route::resource('sales-order', 'SalesOrderController');
         Route::resource('delivery', 'DeliveryController');
+        Route::resource('invoice', 'InvoiceController');
     });
 
     Route::group(['prefix' => 'purchasing'], function () {

@@ -25,7 +25,7 @@
                         <th>Card Code</th>
                         <th>Card Name</th>
                         <th>Type</th>
-                        <th>Action</th>
+                        <th width="10%">Action</th>
                     </tr>
                 </thead>
                 <tbody>

@@ -59,7 +59,7 @@ class SAPServices
         return [
             'Cookie' => 'B1SESSION=' . $this->getSessionId(),
             'Content-Type' => 'application/json',
-            'Prefer' => 'odata.maxpagesize=100',
+            'Prefer' => 'odata.maxpagesize=1000',
         ];
     }
 
