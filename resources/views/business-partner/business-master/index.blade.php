@@ -10,7 +10,7 @@
 
 <div class="card shadow mb-4">
     <div class="card-header py-3 d-flex justify-content-between align-items-center flex-wrap">
-        <h4 class="m-0 font-weight-bold text-primary">List Bussines Master</h4>
+        <h6 class="m-0 font-weight-bold text-primary">List Bussines Master</h6>
         <a href="{{ route('business-master.create') }}" class="btn btn-primary btn-md mr-2">
             <i class="fas fa-user-tie"></i> 
             Add Bussines Master

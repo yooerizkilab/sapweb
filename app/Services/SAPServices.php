@@ -206,4 +206,39 @@ class SAPServices
             ]);
         });
     }
+
+    // Fungsi Cross Join
+    public function crossJoin(array $endpoint, array $parameters = [])
+    {
+        $crossJoin = '$crossjoin(' . implode(',', $endpoint) . ')';
+
+        return $this->handleRequest(function () use ($crossJoin, $parameters) {
+            return $this->client->get($crossJoin, [
+                'headers' => $this->getDefaultHeaders(),
+                'query' => $parameters
+            ]);
+        });
+    }
+
+    // Fungsi Cross Join by ID
+    public function crossJoinById(array $endpoint, string $id, array $parameters = [])
+    {
+        // Validasi input
+        if (!is_scalar($id)) {
+            throw new \InvalidArgumentException('ID harus berupa string atau integer');
+        }
+
+        $formattedId = is_numeric($id)
+            ? $id  // Untuk ID numerik, gunakan langsung
+            : "'" . $id . "'";  // Untuk ID string, bungkus dengan single quote
+
+        $crossJoin = '$crossjoin(' . implode(',', $endpoint) . ')';
+
+        return $this->handleRequest(function () use ($crossJoin, $formattedId, $parameters) {
+            return $this->client->get($crossJoin . "('" . $formattedId . "')", [
+                'headers' => $this->getDefaultHeaders(),
+                'query' => $parameters
+            ]);
+        });
+    }
 }

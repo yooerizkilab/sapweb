@@ -31,6 +31,7 @@ class BusinessPartnerMasterController extends Controller
             $paramsBusessinessMaster = [
                 '$select' => 'CardCode,CardName,CardType',
                 '$filter' => "startswith(CardCode, 'C00') and CardType eq 'C'",
+                // '$filter' => "startswith(CardCode, 'C00') and CardType eq 'C' and CreateDate ge datetime'" . date('Y-01-01T00:00:00') . "' and CreateDate le datetime'" . date('Y-12-31T23:59:59') . "'",
                 '$orderby' => 'CreateDate desc'
             ];
             $businessPartners = $this->sapService->get('BusinessPartners', $paramsBusessinessMaster);

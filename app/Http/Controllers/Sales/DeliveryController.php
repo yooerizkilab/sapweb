@@ -30,6 +30,7 @@ class DeliveryController extends Controller
         try {
             $paramsDeliveries = [
                 '$select' => 'DocEntry,DocNum,DocType,DocDate,CardCode,CardName,DocTotal,DocumentStatus',
+                // '$filter' => "DocDate ge datetime'" . date('Y-01-01T00:00:00') . "' and DocDate le datetime'" . date('Y-12-31T23:59:59') . "'",
                 '$orderby' => 'CreationDate desc'
             ];
             $deliveries = $this->sapService->get('DeliveryNotes', $paramsDeliveries);
@@ -44,7 +45,11 @@ class DeliveryController extends Controller
      */
     public function create()
     {
-        //
+        try {
+            //
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
     }
 
     /**
@@ -52,7 +57,11 @@ class DeliveryController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        try {
+            //
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
     }
 
     /**
@@ -60,7 +69,11 @@ class DeliveryController extends Controller
      */
     public function show(string $id)
     {
-        //
+        try {
+            //
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
     }
 
     /**
@@ -68,7 +81,11 @@ class DeliveryController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        try {
+            //
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
     }
 
     /**
@@ -76,7 +93,11 @@ class DeliveryController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        try {
+            //
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
     }
 
     /**
@@ -84,6 +105,10 @@ class DeliveryController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        try {
+            //
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
     }
 }

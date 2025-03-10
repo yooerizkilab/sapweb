@@ -11,7 +11,7 @@
 <div class="card shadow mb-4">
     <div class="card-header py-3 d-flex justify-content-between align-items-center flex-wrap">
         <h6 class="m-0 font-weight-bold text-primary">List Invoice</h6>
-        <a href="{{ route('invoice.create') }}" class="btn btn-primary btn-md mr-2">
+        <a href="{{ route('sales-invoice.create') }}" class="btn btn-primary btn-md mr-2">
             <i class="fas fa-cart-plus"></i> 
             Add Invoice
         </a>
@@ -46,11 +46,11 @@
                                     <a href="" class="btn btn-primary btn-circle btn-sm mr-1">
                                         <i class="fas fa-print"></i>
                                     </a>
-                                    <a href="{{ route('invoice.show', $invoice['DocEntry']) }}" class="btn btn-info btn-circle btn-sm mr-1">
+                                    <a href="{{ route('sales-invoice.show', $invoice['DocEntry']) }}" class="btn btn-info btn-circle btn-sm mr-1">
                                         <i class="fas fa-eye"></i>
                                     </a>
                                     @if($invoice['DocumentStatus'] == 'bost_Open')
-                                    <a href="{{ route('invoice.edit', $invoice['DocEntry']) }}" class="btn btn-warning btn-circle btn-sm mr-1">
+                                    <a href="{{ route('sales-invoice.edit', $invoice['DocEntry']) }}" class="btn btn-warning btn-circle btn-sm mr-1">
                                         <i class="fas fa-pencil-alt"></i>
                                     </a>
                                     <a href="" class="btn btn-success btn-circle btn-sm mr-1">

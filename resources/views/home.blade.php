@@ -1,4 +1,6 @@
-@extends('layouts.admin')
+@extends('layouts.admin', [
+    'title' => 'Dashboard'
+])
 
 @section('main-content')
 
@@ -8,7 +10,6 @@
     @if (session('success'))
     <div class="alert alert-success border-left-success alert-dismissible fade show" role="alert">
         {{ session('success') }}
-        {{ session('sap_session_id') }}
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>

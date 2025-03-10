@@ -32,19 +32,29 @@ Route::group(['middleware' => ['auth', 'sap.session'], 'prefix' => 'sap'], funct
         Route::resource('sales-quotation', 'SalesQuotationController');
         Route::resource('sales-order', 'SalesOrderController');
         Route::resource('delivery', 'DeliveryController');
-        Route::resource('invoice', 'InvoiceController');
+        Route::resource('sales-invoice', 'SalesInvoiceController');
     });
 
-    Route::group(['prefix' => 'purchasing'], function () {
-        //
+    Route::group(['namespace' => 'Purchasing', 'prefix' => 'purchasing'], function () {
+        Route::resource('purchases-request', 'PurchasesRequestController');
+        // Route::resource('purchases-quotation', 'PurchasesQuotationController');
+        Route::resource('purchases-order', 'PurchasesOrderController');
+        Route::resource('goods-receipt-po', 'GoodsReceiptPOController');
+        Route::resource('purchases-invoice', 'PurchasesInvoiceController');
     });
 
-    Route::group(['prefix' => 'inventory'], function () {
-        //
+    Route::group(['namespace' => 'Inventory', 'prefix' => 'inventory'], function () {
+        Route::resource('item-master-data', 'ItemMasterDataController');
+
+        Route::group(['namespace' => 'Transaction', 'prefix' => 'transaction'], function () {
+            Route::resource('goods-receipt', 'GoodsReceiptController');
+            Route::resource('goods-issue', 'GoodsIssueController');
+        });
     });
 
-    Route::group(['prefix' => 'production'], function () {
-        //
+    Route::group(['namespace' => 'Production', 'prefix' => 'production'], function () {
+        Route::resource('bill-of-material', 'BillOfMaterialController');
+        Route::resource('production-order', 'ProductionOrderController');
     });
 
     Route::get('/profile', 'ProfileController@index')->name('profile');
