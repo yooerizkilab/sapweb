@@ -70,7 +70,8 @@ class DeliveryController extends Controller
     public function show(string $id)
     {
         try {
-            //
+            $deliveries = $this->sapService->getById('DeliveryNotes', $id);
+            return $deliveries;
         } catch (\Exception $e) {
             return $e->getMessage();
         }
