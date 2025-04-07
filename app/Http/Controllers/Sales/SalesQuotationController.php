@@ -263,11 +263,15 @@ class SalesQuotationController extends Controller
      */
     public function edit(string $id)
     {
-        $paramsQuotation = [
-            // '$select' => 'DocEntry,DocNum,DocType,DocDate,CardCode,CardName,DocTotal,DocumentStatus',  
-        ];
-        $quotation = $this->sapService->getById('Quotations', $id, $paramsQuotation);
-        return view('sales.quotation.edit', compact('quotation'));
+        try {
+            $paramsQuotation = [
+                // '$select' => 'DocEntry,DocNum,DocType,DocDate,CardCode,CardName,DocTotal,DocumentStatus',  
+            ];
+            $quotation = $this->sapService->getById('Quotations', $id, $paramsQuotation);
+            return view('sales.quotation.edit', compact('quotation'));
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
     }
 
     /**

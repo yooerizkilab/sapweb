@@ -45,7 +45,7 @@ class PurchasesRequestController extends Controller
     public function create()
     {
         try {
-            //
+            return view('purchasing.purchases-request.create');
         } catch (\Exception $e) {
             return $e->getMessage();
         }
@@ -69,7 +69,7 @@ class PurchasesRequestController extends Controller
     public function show(string $id)
     {
         try {
-            //
+            return view('purchasing.purchases-request.show');
         } catch (\Exception $e) {
             return $e->getMessage();
         }
@@ -81,7 +81,7 @@ class PurchasesRequestController extends Controller
     public function edit(string $id)
     {
         try {
-            //
+            return view('purchasing.purchases-request.edit');
         } catch (\Exception $e) {
             return $e->getMessage();
         }

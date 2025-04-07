@@ -483,10 +483,40 @@
             $('#customerModal, #itemModal, #warehouseModal, #glaccountModal, #projectModal').on('shown.bs.modal',
                 adjustDataTable);
 
-            // Event listener untuk tombol "Add Item"
-            function addItemRow() {
-                var countRows = $('#itemsTable tbody tr').length;
-                $('#itemsTable tbody').append(`
+            // Event listener untuk perubahan kuantitas dan harga satuan (Items)
+            $('#itemsTable tbody').on('input', '.Quantity, .UnitPrice', function() {
+                calculateItemRowTotal($(this).closest('tr'));
+                calculateTotals();
+            });
+
+            // Event listener untuk perubahan kuantitas, harga satuan, dan set price (Services)
+            $('#servicesTable tbody').on('input',
+                '[name$="[Quantity]"], [name$="[UnitPrice]"], [name$="[SetPrice]"]',
+                function() {
+                    calculateServiceRowTotal($(this).closest('tr'));
+                    calculateTotals();
+                });
+
+
+            // Event listener untuk perubahan diskon item
+            $('.discount-input-item').on('input', function() {
+                calculateTotals();
+            });
+
+            // Event listener untuk perubahan diskon service
+            $('.discount-input-service').on('input', function() {
+                calculateTotals();
+            });
+
+            // window.addItemRow = addItemRow;
+            // window.addServiceRow = addServiceRow;
+
+        });
+
+        // Event listener untuk tombol "Add Item"
+        function addItemRow() {
+            var countRows = $('#itemsTable tbody tr').length;
+            $('#itemsTable tbody').append(`
                     <tr>
                         <td>
                             <div class="input-group">
@@ -519,13 +549,13 @@
                         </td>
                     </tr>
                 `);
-                calculateTotals();
-            }
+            calculateTotals();
+        }
 
-            // Event listener untuk tombol "Add Services"
-            function addServiceRow() {
-                var countRows = $('#servicesTable tbody tr').length;
-                $('#servicesTable tbody').append(`
+        // Event listener untuk tombol "Add Services"
+        function addServiceRow() {
+            var countRows = $('#servicesTable tbody tr').length;
+            $('#servicesTable tbody').append(`
                     <tr>
                         <td><input type="text" class="form-control" name="DocumentLines[${countRows}][Description]"></td>
                         <td>
@@ -565,107 +595,77 @@
                         </td>
                     </tr>
                 `);
-                calculateTotals();
-            }
+            calculateTotals();
+        }
 
-            // Event listener untuk tombol "Remove Item"
-            $('#itemsTable tbody').on('click', '.remove-item', function() {
-                $(this).closest('tr').remove();
-                calculateTotals();
-            });
-
-            // Event listener untuk tombol "Remove Service"
-            $('#servicesTable tbody').on('click', '.remove-service', function() {
-                $(this).closest('tr').remove();
-                calculateTotals();
-            });
-
-            // Fungsi untuk menghitung total harga per baris (Items)
-            function calculateItemRowTotal(row) {
-                var quantity = parseFloat(row.find('.Quantity').val()) || 0;
-                var unitPrice = parseFloat(row.find('.UnitPrice').val()) || 0;
-                var rowTotal = quantity * unitPrice;
-                row.find('.TotalPrice').text(rowTotal.toFixed(2));
-                return rowTotal;
-            }
-
-            // Fungsi untuk menghitung total harga per baris (Services)
-            function calculateServiceRowTotal(row) {
-                var quantity = parseFloat(row.find('[name$="[Quantity]"]').val()) || 0;
-                var unitPrice = parseFloat(row.find('[name$="[UnitPrice]"]').val()) || 0;
-                var setPrice = parseFloat(row.find('[name$="[SetPrice]"]').val()) || 0;
-                var rowTotal = quantity * unitPrice + setPrice;
-                row.find('.total-price-service').text(rowTotal.toFixed(2));
-                return rowTotal;
-            }
-
-            // Fungsi untuk menghitung total keseluruhan, diskon, dan grand total
-            function calculateTotals() {
-                var itemsTotal = 0;
-                var servicesTotal = 0;
-
-                $('#itemsTable tbody tr').each(function() {
-                    itemsTotal += calculateItemRowTotal($(this));
-                });
-
-                $('#servicesTable tbody tr').each(function() {
-                    servicesTotal += calculateServiceRowTotal($(this));
-                });
-
-                // Hitung total item
-                $('#total_item').text(itemsTotal.toFixed(2));
-
-                // Hitung diskon item
-                var discountItemPercentage = parseFloat($('.discount-input-item').val()) || 0;
-                var discountItemAmount = (itemsTotal * discountItemPercentage) / 100;
-                $('#discount_amount_item').text(discountItemAmount.toFixed(2));
-
-                // Hitung grand total item
-                var grandTotalItem = itemsTotal - discountItemAmount;
-                $('#grand_total_item').text(grandTotalItem.toFixed(2));
-
-                // Hitung total service
-                $('#total_service').text(servicesTotal.toFixed(2));
-
-                // Hitung diskon service
-                var discountServicePercentage = parseFloat($('.discount-input-service').val()) || 0;
-                var discountServiceAmount = (servicesTotal * discountServicePercentage) / 100;
-                $('#discount_amount_service').text(discountServiceAmount.toFixed(2));
-
-                // Hitung grand total service
-                var grandTotalService = servicesTotal - discountServiceAmount;
-                $('#grand_total_service').text(grandTotalService.toFixed(2));
-            }
-
-            // Event listener untuk perubahan kuantitas dan harga satuan (Items)
-            $('#itemsTable tbody').on('input', '.Quantity, .UnitPrice', function() {
-                calculateItemRowTotal($(this).closest('tr'));
-                calculateTotals();
-            });
-
-            // Event listener untuk perubahan kuantitas, harga satuan, dan set price (Services)
-            $('#servicesTable tbody').on('input',
-                '[name$="[Quantity]"], [name$="[UnitPrice]"], [name$="[SetPrice]"]',
-                function() {
-                    calculateServiceRowTotal($(this).closest('tr'));
-                    calculateTotals();
-                });
-
-
-            // Event listener untuk perubahan diskon item
-            $('.discount-input-item').on('input', function() {
-                calculateTotals();
-            });
-
-            // Event listener untuk perubahan diskon service
-            $('.discount-input-service').on('input', function() {
-                calculateTotals();
-            });
-
-            window.addItemRow = addItemRow;
-            window.addServiceRow = addServiceRow;
-
+        // Event listener untuk tombol "Remove Item"
+        $('#itemsTable tbody').on('click', '.remove-item', function() {
+            $(this).closest('tr').remove();
+            calculateTotals();
         });
+
+        // Event listener untuk tombol "Remove Service"
+        $('#servicesTable tbody').on('click', '.remove-service', function() {
+            $(this).closest('tr').remove();
+            calculateTotals();
+        });
+
+        // Fungsi untuk menghitung total harga per baris (Items)
+        function calculateItemRowTotal(row) {
+            var quantity = parseFloat(row.find('.Quantity').val()) || 0;
+            var unitPrice = parseFloat(row.find('.UnitPrice').val()) || 0;
+            var rowTotal = quantity * unitPrice;
+            row.find('.TotalPrice').text(rowTotal.toFixed(2));
+            return rowTotal;
+        }
+
+        // Fungsi untuk menghitung total harga per baris (Services)
+        function calculateServiceRowTotal(row) {
+            var quantity = parseFloat(row.find('[name$="[Quantity]"]').val()) || 0;
+            var unitPrice = parseFloat(row.find('[name$="[UnitPrice]"]').val()) || 0;
+            var setPrice = parseFloat(row.find('[name$="[SetPrice]"]').val()) || 0;
+            var rowTotal = quantity * unitPrice + setPrice;
+            row.find('.total-price-service').text(rowTotal.toFixed(2));
+            return rowTotal;
+        }
+
+        // Fungsi untuk menghitung total keseluruhan, diskon, dan grand total
+        function calculateTotals() {
+            var itemsTotal = 0;
+            var servicesTotal = 0;
+
+            $('#itemsTable tbody tr').each(function() {
+                itemsTotal += calculateItemRowTotal($(this));
+            });
+
+            $('#servicesTable tbody tr').each(function() {
+                servicesTotal += calculateServiceRowTotal($(this));
+            });
+
+            // Hitung total item
+            $('#total_item').text(itemsTotal.toFixed(2));
+
+            // Hitung diskon item
+            var discountItemPercentage = parseFloat($('.discount-input-item').val()) || 0;
+            var discountItemAmount = (itemsTotal * discountItemPercentage) / 100;
+            $('#discount_amount_item').text(discountItemAmount.toFixed(2));
+
+            // Hitung grand total item
+            var grandTotalItem = itemsTotal - discountItemAmount;
+            $('#grand_total_item').text(grandTotalItem.toFixed(2));
+
+            // Hitung total service
+            $('#total_service').text(servicesTotal.toFixed(2));
+
+            // Hitung diskon service
+            var discountServicePercentage = parseFloat($('.discount-input-service').val()) || 0;
+            var discountServiceAmount = (servicesTotal * discountServicePercentage) / 100;
+            $('#discount_amount_service').text(discountServiceAmount.toFixed(2));
+
+            // Hitung grand total service
+            var grandTotalService = servicesTotal - discountServiceAmount;
+            $('#grand_total_service').text(grandTotalService.toFixed(2));
+        }
 
         function selectCustomer(code, name) {
             $('#customerModal').modal('hide');

@@ -46,7 +46,15 @@ class BusinessPartnerMasterController extends Controller
      */
     public function create()
     {
-        //
+        try {
+            $paramsBusinessPartnerGroups = [
+                '$select' => 'Code,Name'
+            ];
+            $BusinessPartnerGroups = $this->sapService->get('BusinessPartnerGroups', $paramsBusinessPartnerGroups);
+            return view('business-partner.business-master.create', compact('BusinessPartnerGroups'));
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
     }
 
     /**
@@ -160,7 +168,16 @@ class BusinessPartnerMasterController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        try {
+            $paramsBusessinessMaster = [
+                // '$select' => 'CardCode,CardName,CardType',
+            ];
+            $businessPartners = $this->sapService->getById('BusinessPartners', $id, $paramsBusessinessMaster);
+            return $businessPartners;
+            return view('business-partner.business-master.edit', compact('businessPartners'));
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
     }
 
     /**
@@ -168,7 +185,15 @@ class BusinessPartnerMasterController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $request->validate([
+            //
+        ]);
+
+        try {
+            //
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
     }
 
     /**
@@ -176,6 +201,10 @@ class BusinessPartnerMasterController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        try {
+            //
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
     }
 }
