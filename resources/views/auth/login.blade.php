@@ -42,9 +42,10 @@
                                             <select name="database" id="database" class="form-control" required>
                                                 <option value="" disabled selected>Select Database</option>
                                                 <option value="SIMULASI_NEW_UD">SIMULASI NEW UD</option>
-                                                {{-- <option value="NEW_UDMW_LIVE">NEW UDMW LIVE</option> --}}
+                                                {{-- <option value="NEW_UDMW_LIVE">NEW UDMW LIVE</option>
+                                                <option value="NEW_CIREBON">NEW CIREBON</option>
                                                 <option value="SIMULASI_NEW_UD_3">SIMULASI NEW UD 3</option>
-                                                <option value="SIMULASI_NEW_UD_4">SIMULASI NEW UD 4</option>
+                                                <option value="SIMULASI_NEW_UD_4">SIMULASI NEW UD 4</option> --}}
                                             </select>
                                         </div>
 

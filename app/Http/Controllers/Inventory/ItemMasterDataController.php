@@ -73,7 +73,11 @@ class ItemMasterDataController extends Controller
      */
     public function create()
     {
-        //
+        try {
+            return view('inventory.item-master.create');
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
     }
 
     /**
@@ -81,7 +85,11 @@ class ItemMasterDataController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        try {
+            //
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
     }
 
     /**
@@ -106,7 +114,11 @@ class ItemMasterDataController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        try {
+            //
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
     }
 
     /**
@@ -114,7 +126,11 @@ class ItemMasterDataController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        try {
+            //
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
     }
 
     /**
@@ -122,6 +138,10 @@ class ItemMasterDataController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        try {
+            //
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
     }
 }

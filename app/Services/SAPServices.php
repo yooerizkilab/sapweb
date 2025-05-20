@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Promise;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
@@ -36,7 +37,7 @@ class SAPServices
     private function getCacheKey(): string
     {
         $companyDB = session('sap_company_db');
-        return "sap_session_" . Auth::id() . "_" . $companyDB;
+        return "sap_" . Auth::id() . "_" . $companyDB;
     }
 
     /**
@@ -44,7 +45,7 @@ class SAPServices
      */
     private function getCacheKeyForCompany(string $companyDB): string
     {
-        return "sap_session_" . Auth::id() . "_" . $companyDB;
+        return "sap_" . Auth::id() . "_" . $companyDB;
     }
 
     /**
@@ -104,7 +105,7 @@ class SAPServices
         return [
             'Cookie' => 'B1SESSION=' . $this->getSessionId(),
             'Content-Type' => 'application/json',
-            'Prefer' => 'odata.maxpagesize=1000',
+            'Prefer' => 'odata.maxpagesize=1',
         ];
     }
 
@@ -122,7 +123,7 @@ class SAPServices
         return [
             'Cookie' => 'B1SESSION=' . $sessionId,
             'Content-Type' => 'application/json',
-            'Prefer' => 'odata.maxpagesize=1000',
+            'Prefer' => 'odata.maxpagesize=1',
         ];
     }
 
@@ -306,17 +307,66 @@ class SAPServices
         }
     }
 
-    /**
-     * Fungsi GET
-     */
-    public function get(string $endpoint, array $parameters = [])
+    private function generateCacheKey($endpoint, $parameters)
     {
-        return $this->handleRequest(function () use ($endpoint, $parameters) {
+        ksort($parameters);
+        return 'sap_' . md5($endpoint . json_encode($parameters));
+    }
+
+    /**
+     * Fungsi GET All data
+     */
+    public function get(string $endpoint, array $parameters = [], int $pageSize = 1000): array
+    {
+        // caching data request
+        $cacheKey = $this->generateCacheKey($endpoint, $parameters);
+
+        return Cache::remember($cacheKey, now()->addMinutes(25), function () use ($endpoint, $parameters, $pageSize) {
+            $allData = [];
+            $skip = 0;
+
+            do {
+                $batchParams = array_merge($parameters, [
+                    '$top' => $pageSize,
+                    '$skip' => $skip,
+                ]);
+
+                $response = $this->handleRequest(function () use ($endpoint, $batchParams) {
+                    return $this->client->get($endpoint, [
+                        'headers' => array_merge($this->getDefaultHeaders(), [
+                            'Prefer' => 'odata.maxpagesize=' . $batchParams['$top'],
+                        ]),
+                        'query' => $batchParams
+                    ]);
+                });
+
+                $items = $response;
+                $allData = array_merge($allData, $items);
+                $fetchedCount = count($items);
+                $skip += $fetchedCount;
+            } while ($fetchedCount === $pageSize);
+
+            return $allData;
+        });
+    }
+
+    public function forgetCache($endpoint, $parameters)
+    {
+        $cacheKey = $this->generateCacheKey($endpoint, $parameters);
+        Cache::forget($cacheKey);
+    }
+
+    /**
+     * Fungsi GET ke database perusahaan lain
+     */
+    public function getOtherDB(string $companyDB, string $endpoint, array $parameters = [])
+    {
+        return $this->handleRequestForCompany(function () use ($companyDB, $endpoint, $parameters) {
             return $this->client->get($endpoint, [
-                'headers' => $this->getDefaultHeaders(),
+                'headers' => $this->getHeadersForCompany($companyDB),
                 'query' => $parameters
             ]);
-        });
+        }, $companyDB);
     }
 
     /**
@@ -342,32 +392,6 @@ class SAPServices
     }
 
     /**
-     * Fungsi POST
-     */
-    public function post(string $endpoint, array $data)
-    {
-        return $this->handleRequest(function () use ($endpoint, $data) {
-            return $this->client->post($endpoint, [
-                'headers' => array_merge($this->getDefaultHeaders(), ['Prefer' => 'return=representation']),
-                'json' => $data
-            ]);
-        });
-    }
-
-    /**
-     * Fungsi GET ke database perusahaan lain
-     */
-    public function getOtherDB(string $companyDB, string $endpoint, array $parameters = [])
-    {
-        return $this->handleRequestForCompany(function () use ($companyDB, $endpoint, $parameters) {
-            return $this->client->get($endpoint, [
-                'headers' => $this->getHeadersForCompany($companyDB),
-                'query' => $parameters
-            ]);
-        }, $companyDB);
-    }
-
-    /**
      * Fungsi GET by ID ke database perusahaan lain
      */
     public function getByIdOtherDB(string $companyDB, string $endpoint, string $id, array $parameters = [])
@@ -387,6 +411,19 @@ class SAPServices
                 'query' => $parameters
             ]);
         }, $companyDB);
+    }
+
+    /**
+     * Fungsi POST
+     */
+    public function post(string $endpoint, array $data)
+    {
+        return $this->handleRequest(function () use ($endpoint, $data) {
+            return $this->client->post($endpoint, [
+                'headers' => array_merge($this->getDefaultHeaders(), ['Prefer' => 'return=representation']),
+                'json' => $data
+            ]);
+        });
     }
 
     /**
@@ -455,16 +492,35 @@ class SAPServices
     /**
      * Fungsi Cross Join 
      */
-    public function crossJoin(array $endpoint, array $parameters = [])
+    public function crossJoin(array $entities, array $parameters = [], int $pageSize = 1000)
     {
-        $crossJoin = '$crossjoin(' . implode(',', $endpoint) . ')';
+        $crossJoin = '$crossjoin(' . implode(',', $entities) . ')';
 
-        return $this->handleRequest(function () use ($crossJoin, $parameters) {
-            return $this->client->get($crossJoin, [
-                'headers' => $this->getDefaultHeaders(),
-                'query' => $parameters
+        $allData = [];
+        $skip = 0;
+
+        do {
+            $batchParams = array_merge($parameters, [
+                '$top'  => $pageSize,
+                '$skip' => $skip,
             ]);
-        });
+
+            $response = $this->handleRequest(function () use ($crossJoin, $batchParams) {
+                return $this->client->get($crossJoin, [
+                    'headers' => array_merge($this->getDefaultHeaders(), [
+                        'Prefer' => 'odata.maxpagesize=' . $batchParams['$top'],
+                    ]),
+                    'query' => $batchParams
+                ]);
+            });
+
+            $items = $response;
+            $allData = array_merge($allData, $items);
+            $fetchedCount = count($items);
+            $skip += $fetchedCount;
+        } while ($fetchedCount === $pageSize);
+
+        return $allData;
     }
 
     /**

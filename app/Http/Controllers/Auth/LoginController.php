@@ -97,7 +97,7 @@ class LoginController extends Controller
         $this->validateLogin($request);
 
         if (Auth::attempt($request->only($this->username(), 'password'), $request->filled('remember'))) {
-            $database = $request->input('database');
+            $database = $request->input('database'); // Ambil database dari request
 
             // Hapus session lama jika user berpindah database
             $oldCompanyDB = session('sap_company_db');
@@ -137,18 +137,18 @@ class LoginController extends Controller
     {
         $companyDB = session('sap_company_db'); // Ambil database aktif dari session
         $cacheKey = 'sap_session_' . auth()->id() . '_' . $companyDB;
-
         try {
             if ($companyDB && Cache::has($cacheKey)) {
                 app(SAPServices::class)->logout(); // Logout dari SAP
                 Cache::forget($cacheKey); // Hapus session SAP di cache
             }
+            Cache::flush();
         } catch (\Exception $e) {
             Log::error('SAP logout error: ' . $e->getMessage());
         }
 
         // Hapus semua session Laravel
-        session()->forget('sap_company_db');
+        session()->flush(); // Hapus semua data di session
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();

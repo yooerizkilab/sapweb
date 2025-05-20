@@ -26,6 +26,7 @@ Route::group(['middleware' => ['auth', 'sap.session'], 'prefix' => 'sap'], funct
 
     Route::group(['namespace' => 'BusinessPartners', 'prefix' => 'business-partner'], function () {
         Route::resource('business-master', 'BusinessPartnerMasterController');
+        Route::get('api/business-partners', 'BusinessPartnerMasterController@apiBusinessPartners');
     });
 
     Route::group(['namespace' => 'Sales', 'prefix' => 'sales'], function () {

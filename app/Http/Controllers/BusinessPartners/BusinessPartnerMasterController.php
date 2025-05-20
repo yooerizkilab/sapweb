@@ -35,10 +35,19 @@ class BusinessPartnerMasterController extends Controller
                 '$orderby' => 'CreateDate desc'
             ];
             $businessPartners = $this->sapService->get('BusinessPartners', $paramsBusessinessMaster);
+            // return $businessPartners;
             return view('business-partner.business-master.index', compact('businessPartners'));
         } catch (\Exception $e) {
             return $e->getMessage();
         }
+    }
+
+    /**
+     * Get a listing of the resource API.
+     */
+    public function apiBusinessPartners(Request $request)
+    {
+        //
     }
 
     /**
@@ -51,7 +60,23 @@ class BusinessPartnerMasterController extends Controller
                 '$select' => 'Code,Name'
             ];
             $BusinessPartnerGroups = $this->sapService->get('BusinessPartnerGroups', $paramsBusinessPartnerGroups);
-            return view('business-partner.business-master.create', compact('BusinessPartnerGroups'));
+            $paramsSalesPersons = [
+                '$select' => 'SalesEmployeeCode,SalesEmployeeName',
+                '$orderby' => 'SalesEmployeeName asc'
+            ];
+            $SalesPersons = $this->sapService->get('SalesPersons', $paramsSalesPersons);
+            $paramsPaymentTermsTypes = [
+                '$select' => 'GroupNumber,PaymentTermsGroupName',
+                '$orderby' => 'PaymentTermsGroupName asc'
+            ];
+            $PaymentTermsTypes = $this->sapService->get('PaymentTermsTypes', $paramsPaymentTermsTypes);
+            $paramsStates = [
+                '$select' => 'Code,Name',
+                '$filter' => "Country eq 'ID'",
+                '$orderby' => 'Name asc'
+            ];
+            $States = $this->sapService->get('States', $paramsStates);
+            return view('business-partner.business-master.create', compact('BusinessPartnerGroups', 'SalesPersons', 'PaymentTermsTypes'));
         } catch (\Exception $e) {
             return $e->getMessage();
         }
@@ -62,66 +87,83 @@ class BusinessPartnerMasterController extends Controller
      */
     public function store(Request $request)
     {
+        return $request->all();
+
         // Validation
         $request->validate([
             //
         ]);
 
         try {
+            $file = [
+                'FileExtension' => '',
+                'FileName' => '',
+                'SourcePath' => '',
+                'UserID' => '',
+            ];
+            $attachemnts = $this->sapService->post('Attachments2', $file);
+
             $businessPartners = [
+                // Business Partner
+                'Series' => '103',
                 'CardType' => $request->CardType,
-                'CardName' => $request->CardName,
                 'GroupCode' => $request->GroupCode,
+                'CardName' => $request->CardName,
                 'Cellular' => $request->Cellular,
                 'FederalTaxID' => $request->FederalTaxID,
-                'Address' => $request->Address,
-                'Country' => $request->Country,
-                'State' => $request->State,
-                'City' => $request->City,
-                'County' => $request->County,
-                'Street' => $request->Street,
-                'Notes' => $request->Notes,
+                'ContactPerson' => $request->CardName,
+                // Contact Address
+                'Country' => 'ID',
+                'City' => $request->CityBill,
+                'County' => $request->CountyBill,
+                'Address' => $request->StreetBill,
+                // Sales
                 'SalesPersonCode' => $request->SalesPersonCode,
+                // Payment 
                 'PayTermsGrpCode' => $request->PayTermsGrpCode,
                 'CreditLimit' => $request->CreditLimit,
-                'MaxCommitment' => $request->MaxCommitment,
+                'MaxCommitment' => $request->CreditLimit,
+                // Affiliate
                 'Affiliate' => $request->Affiliate,
-                'Series' => '103',
+                // 'AffiliateFor' => $request->AffiliateFor, to create new Business Partner in other DB
+                // Notes 
+                'Notes' => $request->Notes,
+                // Attachment
+                'AttachmentEntry' => $attachemnts['AttachmentEntry'],
+                // Contact Address Bill and Ship
                 'BPAddresses' => [
                     [
                         'AddressName' => 'BILL TO',
                         'AddressType' => 'bo_BillTo',
-                        'Country' => $request->Country,
-                        'State' => $request->State,
-                        'City' => $request->City,
-                        'County' => $request->County,
-                        'Street' => $request->Street
+                        'Country' => 'ID',
+                        'State' => $request->StateBill,
+                        'City' => $request->CityBill,
+                        'County' => $request->CountyBill,
+                        'Street' => $request->StreetBill
                     ],
                     [
                         'AddressName' => 'SHIP TO',
                         'AddressType' => 'bo_ShipTo',
-                        'Country' => $request->Country,
-                        'State' => $request->State,
-                        'City' => $request->City,
-                        'County' => $request->County,
-                        'Street' => $request->Street
+                        'Country' => 'ID',
+                        'State' => $request->StateShip,
+                        'City' => $request->CityShip,
+                        'County' => $request->CountyShip,
+                        'Street' => $request->StreetShip
                     ]
                 ],
+                // Contact
                 'ContactEmployees' => [
                     [
-                        'Name' => $request->Name,
-                        'FirstName' => $request->FirstName,
-                        'LastName' => $request->LastName,
-                        'MobilePhone' => $request->MobilePhone,
-                        'Email' => $request->Email,
-                        'Position' => $request->Position,
-                        'Address' => $request->Address
+                        'Name' => $request->CardName,
+                        'MobilePhone' => $request->Cellular,
+                        'Address' => $request->StreetBill,
                     ]
                 ]
             ];
 
             $businessPartner = $this->sapService->post('BusinessPartners', $businessPartners);
-            return redirect()->back()->with('success', 'Business Partner ' . $businessPartner['CardCode'] . ' created successfully.');
+            return $businessPartner;
+            // return redirect()->back()->with('success', 'Business Partner ' . $businessPartner['CardCode'] . ' created successfully.');
         } catch (\Exception $e) {
             return $e->getMessage();
         }
@@ -170,11 +212,25 @@ class BusinessPartnerMasterController extends Controller
     {
         try {
             $paramsBusessinessMaster = [
-                // '$select' => 'CardCode,CardName,CardType',
+                // '$select' => 'CardCode,CardName,CardType,',
             ];
-            $businessPartners = $this->sapService->getById('BusinessPartners', $id, $paramsBusessinessMaster);
-            return $businessPartners;
-            return view('business-partner.business-master.edit', compact('businessPartners'));
+            $BusinessPartners = $this->sapService->getById('BusinessPartners', $id, $paramsBusessinessMaster);
+            $paramsBusinessPartnerGroups = [
+                '$select' => 'Code,Name'
+            ];
+            $BusinessPartnerGroups = $this->sapService->get('BusinessPartnerGroups', $paramsBusinessPartnerGroups);
+            $paramsSalesPersons = [
+                '$select' => 'SalesEmployeeCode,SalesEmployeeName',
+                '$orderby' => 'SalesEmployeeName asc'
+            ];
+            $SalesPersons = $this->sapService->get('SalesPersons', $paramsSalesPersons);
+            $paramsPaymentTermsTypes = [
+                '$select' => 'GroupNumber,PaymentTermsGroupName',
+                '$orderby' => 'PaymentTermsGroupName asc'
+            ];
+            $PaymentTermsTypes = $this->sapService->get('PaymentTermsTypes', $paramsPaymentTermsTypes);
+            $Attachments = $this->sapService->getById('Attachments2', $BusinessPartners['AttachmentEntry']);
+            return view('business-partner.business-master.edit', compact('BusinessPartners', 'BusinessPartnerGroups', 'SalesPersons', 'PaymentTermsTypes'));
         } catch (\Exception $e) {
             return $e->getMessage();
         }
@@ -185,12 +241,70 @@ class BusinessPartnerMasterController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        return $request->all();
+
         $request->validate([
             //
         ]);
 
         try {
-            //
+            $businessPartners = [
+                'CardType' => $request->CardType,
+                'GroupCode' => $request->GroupCode,
+                'CardName' => $request->CardName,
+                'Cellular' => $request->Cellular,
+                'FederalTaxID' => $request->FederalTaxID,
+                'ContactPerson' => $request->CardName,
+                // Contact Address
+                'Country' => 'ID',
+                'City' => $request->CityBill,
+                'County' => $request->CountyBill,
+                'Address' => $request->StreetBill,
+                // Sales
+                'SalesPersonCode' => $request->SalesPersonCode,
+                // Payment 
+                'PayTermsGrpCode' => $request->PayTermsGrpCode,
+                'CreditLimit' => $request->CreditLimit,
+                'MaxCommitment' => $request->CreditLimit,
+                // Affiliate
+                'Affiliate' => $request->Affiliate,
+                // 'AffiliateFor' => $request->AffiliateFor, to create new Business Partner in other DB
+                // Notes 
+                'Notes' => $request->Notes,
+                // Attachment
+                // 'AttachmentEntry' => $attachemnts['AttachmentEntry'], // to update attachment
+                // Contact Address Bill and Ship
+                'BPAddresses' => [
+                    [
+                        'AddressName' => 'BILL TO',
+                        'AddressType' => 'bo_BillTo',
+                        'Country' => 'ID',
+                        'State' => $request->StateBill,
+                        'City' => $request->CityBill,
+                        'County' => $request->CountyBill,
+                        'Street' => $request->StreetBill
+                    ],
+                    [
+                        'AddressName' => 'SHIP TO',
+                        'AddressType' => 'bo_ShipTo',
+                        'Country' => 'ID',
+                        'State' => $request->StateShip,
+                        'City' => $request->CityShip,
+                        'County' => $request->CountyShip,
+                        'Street' => $request->StreetShip
+                    ]
+                ],
+                // Contact
+                'ContactEmployees' => [
+                    [
+                        'Name' => $request->CardName,
+                        'MobilePhone' => $request->Cellular,
+                        'Address' => $request->StreetBill,
+                    ]
+                ]
+            ];
+            $BusinessPartners = $this->sapService->patch('BusinessPartners', $id, $businessPartners);
+            return redirect()->back()->with('success', 'Business Partner ' . $BusinessPartners['CardCode'] . ' updated successfully.');
         } catch (\Exception $e) {
             return $e->getMessage();
         }
@@ -201,8 +315,10 @@ class BusinessPartnerMasterController extends Controller
      */
     public function destroy(string $id)
     {
+        return $id;
         try {
-            //
+            $BusinessPartners = $this->sapService->delete('BusinessPartners', $id);
+            return redirect()->back()->with('success', 'Business Partner ' . $BusinessPartners['CardCode'] . ' deleted successfully.');
         } catch (\Exception $e) {
             return $e->getMessage();
         }

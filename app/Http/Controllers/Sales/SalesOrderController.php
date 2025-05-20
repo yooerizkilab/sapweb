@@ -70,7 +70,20 @@ class SalesOrderController extends Controller
     public function show(string $id)
     {
         try {
-            //
+            $paramsOrders = [
+                '$select' => 'DocEntry,DocNum,DocType,DocDate,DocDueDate,CardCode,CardName,Address,NumAtCard,VatSum,DocTotal,Comments,PaymentGroupCode,SalesPersonCode,DocumentStatus,DocumentLines',
+            ];
+            $Orders = $this->sapService->getById('Orders', $id, $paramsOrders);
+            $paramsPaymentTermsTypes = [
+                '$select' => 'GroupNumber,PaymentTermsGroupName',
+            ];
+            $PaymentTermsTypes = $this->sapService->getById('PaymentTermsTypes', $Orders['PaymentGroupCode'], $paramsPaymentTermsTypes);
+            $paramsSalesPersons = [
+                '$select' => 'SalesEmployeeCode,SalesEmployeeName',
+            ];
+            $SalesPersons = $this->sapService->getById('SalesPersons', $Orders['SalesPersonCode'], $paramsSalesPersons);
+            return $Orders;
+            return view('sales.order.show', compact('Orders', 'PaymentTermsTypes', 'SalesPersons'));
         } catch (\Exception $e) {
             return $e->getMessage();
         }
