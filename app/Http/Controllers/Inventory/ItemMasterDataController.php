@@ -3,23 +3,17 @@
 namespace App\Http\Controllers\Inventory;
 
 use App\Http\Controllers\Controller;
-use App\Services\SAPServices;
 use Illuminate\Http\Request;
+use App\Services\SAP\Facades\SAP;
 
 class ItemMasterDataController extends Controller
 {
     /*
-    * @var $sapService
-    */
-    protected $sapService;
-
-    /*
     * Create a new controller instance.
     */
-    public function __construct(SAPServices $sapService)
+    public function __construct()
     {
         $this->middleware('auth');
-        $this->sapService = $sapService;
     }
 
     /**
@@ -33,7 +27,7 @@ class ItemMasterDataController extends Controller
                 '$select' => 'ItemCode,ItemName,ForeignName,ItemsGroupCode,ItemType',
                 '$orderby' => 'CreateDate desc',
             ];
-            $items = $this->sapService->get('Items', $paramsItem);
+            $items = SAP::get('Items', $paramsItem);
 
             // Pastikan $items adalah array sebelum memproses
             if (empty($items) || !is_array($items)) {
@@ -54,7 +48,7 @@ class ItemMasterDataController extends Controller
                     '$select' => 'Number,GroupName',
                     '$filter' => $filterGroups,
                 ];
-                $groups = $this->sapService->get('ItemGroups', $paramsGroup);
+                $groups = SAP::get('ItemGroups', $paramsGroup);
 
                 // Jika hasilnya dalam nested array "value", ambil datanya
                 $groups = $groups['value'] ?? $groups;
@@ -102,7 +96,7 @@ class ItemMasterDataController extends Controller
                 // '$select' => 'ItemCode,ItemName,ForeignName,ItemsGroupCode,ItemType',
                 // '$orderby' => 'CreateDate desc',
             ];
-            $items = $this->sapService->getById('Items', $id, $paramsItem);
+            $items = SAP::getById('Items', $id, $paramsItem);
             return $items;
         } catch (\Exception $e) {
             return $e->getMessage();

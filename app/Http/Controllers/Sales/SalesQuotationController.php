@@ -3,23 +3,17 @@
 namespace App\Http\Controllers\Sales;
 
 use App\Http\Controllers\Controller;
-use App\Services\SAPServices;
+use App\Services\SAP\Facades\SAP;
 use Illuminate\Http\Request;
 
 class SalesQuotationController extends Controller
 {
     /*
-    * @var $sapService
-    */
-    protected $sapService;
-
-    /*
     * Create a new controller instance.
     */
-    public function __construct(SAPServices $sapService)
+    public function __construct()
     {
         $this->middleware('auth');
-        $this->sapService = $sapService;
     }
 
     /**
@@ -33,7 +27,7 @@ class SalesQuotationController extends Controller
                 // '$filter' => "DocDate ge datetime'" . date('Y-01-01T00:00:00') . "' and DocDate le datetime'" . date('Y-12-31T23:59:59') . "'",
                 '$orderby' => 'CreationDate desc'
             ];
-            $quotations = $this->sapService->get('Quotations', $paramsQuotations);
+            $quotations = SAP::get('Quotations', $paramsQuotations);
             return view('sales.quotation.index', compact('quotations'));
         } catch (\Exception $e) {
             return $e->getMessage();
@@ -49,23 +43,23 @@ class SalesQuotationController extends Controller
             $paramsSalesPersons = [
                 '$select' => 'SalesEmployeeCode,SalesEmployeeName',
             ];
-            $salesPersons = $this->sapService->getById('SalesPersons', 1, $paramsSalesPersons);
+            $salesPersons = SAP::getById('SalesPersons', 1, $paramsSalesPersons);
             $paramsBusinessPartners = [
                 '$select' => 'CardCode,CardName',
                 '$filter' => "startswith(CardCode, 'C00') and CardType eq 'C'",
                 '$orderby' => 'CreateDate desc'
             ];
-            $businessPartners = $this->sapService->get('BusinessPartners', $paramsBusinessPartners);
+            $businessPartners = SAP::get('BusinessPartners', $paramsBusinessPartners);
             $paramsItems = [
                 '$expand' => 'Items($select=ItemCode,ItemName,ItemsGroupCode,U_IT_Profil,U_IT_Tebal,U_HR_AZ,Properties1,Properties2,Properties3,Properties4,Properties5,Properties6,Properties7,Properties8,Properties9,Properties10,Properties11,Properties12,Properties13,Properties14,Properties15,Properties16,Properties17,Properties18),U_HR_GRP_PROFILE($select=Code,Name,U_GrpName)',
                 '$filter' => 'Items/U_IT_Profil eq U_HR_GRP_PROFILE/Code and Items/SalesItem eq \'tYES\' and Items/Valid eq \'tYES\' and (Items/ItemsGroupCode eq 101 or Items/ItemsGroupCode eq 102)',
                 '$orderby' => 'Items/ItemCode asc'
             ];
-            $items = $this->sapService->crossJoin(['Items,U_HR_GRP_PROFILE'], $paramsItems);
+            $items = SAP::crossJoin(['Items,U_HR_GRP_PROFILE'], $paramsItems);
             $paramsPrice = [
                 '$select' => 'Code,Name,U_Harga1,U_Harga2,U_Harga3,U_HET,U_Tebal',
             ];
-            $price = $this->sapService->get('U_HR_GRP_PRICE');
+            $price = SAP::get('U_HR_GRP_PRICE');
 
             $priceCollection = collect($price);
 
@@ -188,19 +182,19 @@ class SalesQuotationController extends Controller
             $paramsWarehouses = [
                 '$select' => 'WarehouseCode,WarehouseName',
             ];
-            $warehouses = $this->sapService->get('Warehouses', $paramsWarehouses);
+            $warehouses = SAP::get('Warehouses', $paramsWarehouses);
             $paramsChartOfAccounts = [
                 '$select' => 'Code,Name',
             ];
-            $chartOfAccounts = $this->sapService->get('ChartOfAccounts', $paramsChartOfAccounts);
+            $chartOfAccounts = SAP::get('ChartOfAccounts', $paramsChartOfAccounts);
             $paramsProjects = [
                 '$select' => 'Code,Name',
             ];
-            $projects = $this->sapService->get('Projects', $paramsProjects);
+            $projects = SAP::get('Projects', $paramsProjects);
             $paramsUnitOfMeasures = [
                 '$select' => 'Code,Name',
             ];
-            $unitOfMeasures = $this->sapService->get('UnitOfMeasurements', $paramsUnitOfMeasures);
+            $unitOfMeasures = SAP::get('UnitOfMeasurements', $paramsUnitOfMeasures);
             return view('sales.quotation.create', compact('businessPartners', 'itemPrice', 'warehouses', 'chartOfAccounts', 'projects', 'unitOfMeasures', 'salesPersons'));
         } catch (\Exception $e) {
             return $e->getMessage();
@@ -229,11 +223,11 @@ class SalesQuotationController extends Controller
             $paramsQuotation = [
                 // '$select' => 'DocEntry,DocNum,DocType,DocDate,CardCode,CardName,DocTotal,DocumentStatus',  
             ];
-            $quotation = $this->sapService->getById('Quotations', $id, $paramsQuotation);
+            $quotation = SAP::getById('Quotations', $id, $paramsQuotation);
             $paramsSalesPersons = [
                 '$select' => 'SalesEmployeeCode,SalesEmployeeName',
             ];
-            $salesPersons = $this->sapService->getById('SalesPersons', $quotation['SalesPersonCode'], $paramsSalesPersons);
+            $salesPersons = SAP::getById('SalesPersons', $quotation['SalesPersonCode'], $paramsSalesPersons);
 
             // Pastikan DocumentLines ada sebelum mengambil AccountCode
             $coaGroup = isset($quotation['DocumentLines'])
@@ -245,7 +239,7 @@ class SalesQuotationController extends Controller
                     ? "Code eq '{$coaGroup[0]}'"
                     : implode(' or ', array_map(fn($code) => "Code eq '{$code}'", $coaGroup));
 
-                $chartOfAccounts = $this->sapService->get('ChartOfAccounts', [
+                $chartOfAccounts = SAP::get('ChartOfAccounts', [
                     '$select' => 'Code,Name',
                     '$filter' => $filter
                 ]);
@@ -267,7 +261,7 @@ class SalesQuotationController extends Controller
             $paramsQuotation = [
                 // '$select' => 'DocEntry,DocNum,DocType,DocDate,CardCode,CardName,DocTotal,DocumentStatus',  
             ];
-            $quotation = $this->sapService->getById('Quotations', $id, $paramsQuotation);
+            $quotation = SAP::getById('Quotations', $id, $paramsQuotation);
             return view('sales.quotation.edit', compact('quotation'));
         } catch (\Exception $e) {
             return $e->getMessage();

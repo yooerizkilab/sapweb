@@ -3,23 +3,17 @@
 namespace App\Http\Controllers\Production;
 
 use App\Http\Controllers\Controller;
-use App\Services\SAPServices;
+use App\Services\SAP\Facades\SAP;
 use Illuminate\Http\Request;
 
 class BillOfMaterialController extends Controller
 {
     /*
-    * @var $sapService
-    */
-    protected $sapService;
-
-    /*
     * Create a new controller instance.
     */
-    public function __construct(SAPServices $sapService)
+    public function __construct()
     {
         $this->middleware('auth');
-        $this->sapService = $sapService;
     }
 
     /**
@@ -33,7 +27,7 @@ class BillOfMaterialController extends Controller
                 '$orderby' => 'TreeCode desc'
             ];
 
-            $billOfMaterials = $this->sapService->get('ProductTrees', $paramsBillOfMaterial);
+            $billOfMaterials = SAP::get('ProductTrees', $paramsBillOfMaterial);
 
             // Pastikan $items adalah array sebelum memproses
             if (empty($billOfMaterials) || !is_array($billOfMaterials)) {
@@ -54,7 +48,7 @@ class BillOfMaterialController extends Controller
                     '$select' => 'WarehouseCode,WarehouseName',
                     '$filter' => $filterCodes,
                 ];
-                $warehouses = $this->sapService->get('Warehouses', $paramsWarehouse);
+                $warehouses = SAP::get('Warehouses', $paramsWarehouse);
 
                 // Jika hasilnya dalam nested array "value", ambil datanya
                 $warehouses = $warehouses['value'] ?? $warehouses;

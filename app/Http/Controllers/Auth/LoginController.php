@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers\Auth;
 
-use Illuminate\Http\Request;
-use Illuminate\Foundation\Auth\AuthenticatesUsers;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\ValidationException;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
-use App\Services\SAPServices;
 use App\Models\User;
+use App\Services\SAP\Facades\SAP; // Ubah ke Facade baru
+use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 
 class LoginController extends Controller
 {
@@ -102,16 +102,15 @@ class LoginController extends Controller
             // Hapus session lama jika user berpindah database
             $oldCompanyDB = session('sap_company_db');
             if ($oldCompanyDB && $oldCompanyDB !== $database) {
-                app(SAPServices::class)->logout(); // Logout session lama
-                Cache::forget('sap_session_' . Auth::id() . '_' . $oldCompanyDB);
+                // Menggunakan Facade baru untuk logout
+                SAP::logout();
             }
 
             // Simpan database baru ke session
             session(['sap_company_db' => $database]);
 
             // Login ke SAP dengan database baru
-            $sapService = app(SAPServices::class);
-            $loginResult = $sapService->login($database);
+            $loginResult = SAP::login();
 
             if ($loginResult === true) {
                 return redirect()->intended($this->redirectPath());
@@ -135,12 +134,10 @@ class LoginController extends Controller
      */
     public function logout(Request $request)
     {
-        $companyDB = session('sap_company_db'); // Ambil database aktif dari session
-        $cacheKey = 'sap_session_' . auth()->id() . '_' . $companyDB;
         try {
-            if ($companyDB && Cache::has($cacheKey)) {
-                app(SAPServices::class)->logout(); // Logout dari SAP
-                Cache::forget($cacheKey); // Hapus session SAP di cache
+            // Logout dari SAP jika session ada
+            if (session('sap_company_db')) {
+                SAP::logout(); // Menggunakan Facade baru untuk logout
             }
             Cache::flush();
         } catch (\Exception $e) {

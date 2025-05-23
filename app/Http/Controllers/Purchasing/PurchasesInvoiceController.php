@@ -3,23 +3,17 @@
 namespace App\Http\Controllers\Purchasing;
 
 use App\Http\Controllers\Controller;
-use App\Services\SAPServices;
+use App\Services\SAP\Facades\SAP;
 use Illuminate\Http\Request;
 
 class PurchasesInvoiceController extends Controller
 {
     /*
-    * @var $sapService
-    */
-    protected $sapService;
-
-    /*
     * Create a new controller instance.
     */
-    public function __construct(SAPServices $sapService)
+    public function __construct()
     {
         $this->middleware('auth');
-        $this->sapService = $sapService;
     }
 
     /**
@@ -32,7 +26,7 @@ class PurchasesInvoiceController extends Controller
                 '$select' => 'DocEntry,DocNum,DocType,DocDate,CardCode,CardName,DocTotal,DocumentStatus',
                 '$orderby' => 'CreationDate desc'
             ];
-            $invoices = $this->sapService->get('PurchaseInvoices', $paramsInvoices);
+            $invoices = SAP::get('PurchaseInvoices', $paramsInvoices);
             return view('purchasing.invoice.index', compact('invoices'));
         } catch (\Exception $e) {
             return $e->getMessage();

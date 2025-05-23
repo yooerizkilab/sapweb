@@ -3,23 +3,17 @@
 namespace App\Http\Controllers\Production;
 
 use App\Http\Controllers\Controller;
-use App\Services\SAPServices;
+use App\Services\SAP\Facades\SAP;
 use Illuminate\Http\Request;
 
 class ProductionOrderController extends Controller
 {
     /*
-    * @var $sapService
-    */
-    protected $sapService;
-
-    /*
     * Create a new controller instance.
     */
-    public function __construct(SAPServices $sapService)
+    public function __construct()
     {
         $this->middleware('auth');
-        $this->sapService = $sapService;
     }
 
     /**
@@ -32,7 +26,7 @@ class ProductionOrderController extends Controller
                 '$select' => 'AbsoluteEntry,DocumentNumber,ItemNo,ProductionOrderStatus,PlannedQuantity,PostingDate,Warehouse,ProductDescription,U_IT_Panjang',
                 '$orderby' => 'CreationDate desc'
             ];
-            $productionOrders = $this->sapService->get('ProductionOrders', $paramsProductionOrder);
+            $productionOrders = SAP::get('ProductionOrders', $paramsProductionOrder);
 
             // Pastikan $items adalah array sebelum memproses
             if (empty($productionOrders) || !is_array($productionOrders)) {
@@ -53,7 +47,7 @@ class ProductionOrderController extends Controller
                     '$select' => 'WarehouseCode,WarehouseName',
                     '$filter' => $filterCodes,
                 ];
-                $warehouses = $this->sapService->get('Warehouses', $paramsWarehouse);
+                $warehouses = SAP::get('Warehouses', $paramsWarehouse);
 
                 // Jika hasilnya dalam nested array "value", ambil datanya
                 $warehouses = $warehouses['value'] ?? $warehouses;

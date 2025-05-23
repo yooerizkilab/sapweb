@@ -3,23 +3,18 @@
 namespace App\Http\Controllers\Inventory\Transaction;
 
 use App\Http\Controllers\Controller;
-use App\Services\SAPServices;
+use App\Services\SAP\Facades\SAP;
 use Illuminate\Http\Request;
 
 class GoodsIssueController extends Controller
 {
-    /*
-    * @var $sapService
-    */
-    protected $sapService;
 
     /*
     * Create a new controller instance.
     */
-    public function __construct(SAPServices $sapService)
+    public function __construct()
     {
         $this->middleware('auth');
-        $this->sapService = $sapService;
     }
 
     /**
@@ -33,7 +28,7 @@ class GoodsIssueController extends Controller
                 '$select' => 'DocEntry,DocNum,DocType,DocDate,DocTotal,DocumentStatus',
                 '$orderby' => 'CreationDate desc'
             ];
-            $goodsIssues = $this->sapService->get('InventoryGenExits', $paramsGoodsIssue);
+            $goodsIssues = SAP::get('InventoryGenExits', $paramsGoodsIssue);
             return view('inventory.transaction.goods-issue.index', compact('goodsIssues'));
         } catch (\Exception $e) {
             return $e->getMessage();

@@ -3,23 +3,17 @@
 namespace App\Http\Controllers\BusinessPartners;
 
 use App\Http\Controllers\Controller;
-use App\Services\SAPServices;
+use App\Services\SAP\Facades\SAP;
 use Illuminate\Http\Request;
 
 class BusinessPartnerMasterController extends Controller
 {
     /*
-    * @var $sapService
-    */
-    protected $sapService;
-
-    /*
     * Create a new controller instance.
     */
-    public function __construct(SAPServices $sapService)
+    public function __construct()
     {
         $this->middleware('auth');
-        $this->sapService = $sapService;
     }
 
     /**
@@ -34,20 +28,11 @@ class BusinessPartnerMasterController extends Controller
                 // '$filter' => "startswith(CardCode, 'C00') and CardType eq 'C' and CreateDate ge datetime'" . date('Y-01-01T00:00:00') . "' and CreateDate le datetime'" . date('Y-12-31T23:59:59') . "'",
                 '$orderby' => 'CreateDate desc'
             ];
-            $businessPartners = $this->sapService->get('BusinessPartners', $paramsBusessinessMaster);
-            // return $businessPartners;
+            $businessPartners = SAP::get('BusinessPartners', $paramsBusessinessMaster);
             return view('business-partner.business-master.index', compact('businessPartners'));
         } catch (\Exception $e) {
             return $e->getMessage();
         }
-    }
-
-    /**
-     * Get a listing of the resource API.
-     */
-    public function apiBusinessPartners(Request $request)
-    {
-        //
     }
 
     /**
@@ -59,23 +44,23 @@ class BusinessPartnerMasterController extends Controller
             $paramsBusinessPartnerGroups = [
                 '$select' => 'Code,Name'
             ];
-            $BusinessPartnerGroups = $this->sapService->get('BusinessPartnerGroups', $paramsBusinessPartnerGroups);
+            $BusinessPartnerGroups = SAP::get('BusinessPartnerGroups', $paramsBusinessPartnerGroups);
             $paramsSalesPersons = [
                 '$select' => 'SalesEmployeeCode,SalesEmployeeName',
                 '$orderby' => 'SalesEmployeeName asc'
             ];
-            $SalesPersons = $this->sapService->get('SalesPersons', $paramsSalesPersons);
+            $SalesPersons = SAP::get('SalesPersons', $paramsSalesPersons);
             $paramsPaymentTermsTypes = [
                 '$select' => 'GroupNumber,PaymentTermsGroupName',
                 '$orderby' => 'PaymentTermsGroupName asc'
             ];
-            $PaymentTermsTypes = $this->sapService->get('PaymentTermsTypes', $paramsPaymentTermsTypes);
+            $PaymentTermsTypes = SAP::get('PaymentTermsTypes', $paramsPaymentTermsTypes);
             $paramsStates = [
                 '$select' => 'Code,Name',
                 '$filter' => "Country eq 'ID'",
                 '$orderby' => 'Name asc'
             ];
-            $States = $this->sapService->get('States', $paramsStates);
+            $States = SAP::get('States', $paramsStates);
             return view('business-partner.business-master.create', compact('BusinessPartnerGroups', 'SalesPersons', 'PaymentTermsTypes'));
         } catch (\Exception $e) {
             return $e->getMessage();
@@ -101,7 +86,7 @@ class BusinessPartnerMasterController extends Controller
                 'SourcePath' => '',
                 'UserID' => '',
             ];
-            $attachemnts = $this->sapService->post('Attachments2', $file);
+            $attachemnts = SAP::post('Attachments2', $file);
 
             $businessPartners = [
                 // Business Partner
@@ -161,7 +146,7 @@ class BusinessPartnerMasterController extends Controller
                 ]
             ];
 
-            $businessPartner = $this->sapService->post('BusinessPartners', $businessPartners);
+            $businessPartner = SAP::post('BusinessPartners', $businessPartners);
             return $businessPartner;
             // return redirect()->back()->with('success', 'Business Partner ' . $businessPartner['CardCode'] . ' created successfully.');
         } catch (\Exception $e) {
@@ -178,27 +163,27 @@ class BusinessPartnerMasterController extends Controller
             $paramsBusessinessMaster = [
                 // '$select' => 'CardCode,CardName,CardType',
             ];
-            $businessPartners = $this->sapService->getById('BusinessPartners', $id, $paramsBusessinessMaster);
+            $businessPartners = SAP::getById('BusinessPartners', $id, $paramsBusessinessMaster);
             $paramsBussinesGroups = [
                 '$select'  => 'Name'
             ];
-            $businessGroups = $this->sapService->getById('BusinessPartnerGroups', $businessPartners['GroupCode'], $paramsBussinesGroups);
+            $businessGroups = SAP::getById('BusinessPartnerGroups', $businessPartners['GroupCode'], $paramsBussinesGroups);
             $paramsSales = [
                 '$select' => 'SalesEmployeeName,Telephone'
             ];
-            $businessSales = $this->sapService->getById('SalesPersons', $businessPartners['SalesPersonCode'], $paramsSales);
+            $businessSales = SAP::getById('SalesPersons', $businessPartners['SalesPersonCode'], $paramsSales);
             $paramsPaymentTerms = [
                 '$select'  => 'GroupNumber,PaymentTermsGroupName',
             ];
-            $businessPaymentTermsTypes = $this->sapService->getById('PaymentTermsTypes', $businessPartners['PayTermsGrpCode'], $paramsPaymentTerms);
+            $businessPaymentTermsTypes = SAP::getById('PaymentTermsTypes', $businessPartners['PayTermsGrpCode'], $paramsPaymentTerms);
             $paramsCountry = [
                 '$select' => 'Name'
             ];
-            $countries = $this->sapService->getById('Countries', $businessPartners['Country'], $paramsCountry);
+            $countries = SAP::getById('Countries', $businessPartners['Country'], $paramsCountry);
             $paramsStates = [
                 '$select' => 'Name'
             ];
-            $states = $this->sapService->getById('States', $businessPartners['Country'], $paramsStates);
+            $states = SAP::getById('States', $businessPartners['Country'], $paramsStates);
             return view('business-partner.business-master.show', compact('businessPartners', 'businessGroups', 'businessSales', 'businessPaymentTermsTypes', 'countries', 'states'));
         } catch (\Exception $e) {
             return $e->getMessage();
@@ -214,22 +199,22 @@ class BusinessPartnerMasterController extends Controller
             $paramsBusessinessMaster = [
                 // '$select' => 'CardCode,CardName,CardType,',
             ];
-            $BusinessPartners = $this->sapService->getById('BusinessPartners', $id, $paramsBusessinessMaster);
+            $BusinessPartners = SAP::getById('BusinessPartners', $id, $paramsBusessinessMaster);
             $paramsBusinessPartnerGroups = [
                 '$select' => 'Code,Name'
             ];
-            $BusinessPartnerGroups = $this->sapService->get('BusinessPartnerGroups', $paramsBusinessPartnerGroups);
+            $BusinessPartnerGroups = SAP::get('BusinessPartnerGroups', $paramsBusinessPartnerGroups);
             $paramsSalesPersons = [
                 '$select' => 'SalesEmployeeCode,SalesEmployeeName',
                 '$orderby' => 'SalesEmployeeName asc'
             ];
-            $SalesPersons = $this->sapService->get('SalesPersons', $paramsSalesPersons);
+            $SalesPersons = SAP::get('SalesPersons', $paramsSalesPersons);
             $paramsPaymentTermsTypes = [
                 '$select' => 'GroupNumber,PaymentTermsGroupName',
                 '$orderby' => 'PaymentTermsGroupName asc'
             ];
-            $PaymentTermsTypes = $this->sapService->get('PaymentTermsTypes', $paramsPaymentTermsTypes);
-            $Attachments = $this->sapService->getById('Attachments2', $BusinessPartners['AttachmentEntry']);
+            $PaymentTermsTypes = SAP::get('PaymentTermsTypes', $paramsPaymentTermsTypes);
+            $Attachments = SAP::getById('Attachments2', $BusinessPartners['AttachmentEntry']);
             return view('business-partner.business-master.edit', compact('BusinessPartners', 'BusinessPartnerGroups', 'SalesPersons', 'PaymentTermsTypes'));
         } catch (\Exception $e) {
             return $e->getMessage();
@@ -303,7 +288,7 @@ class BusinessPartnerMasterController extends Controller
                     ]
                 ]
             ];
-            $BusinessPartners = $this->sapService->patch('BusinessPartners', $id, $businessPartners);
+            $BusinessPartners = SAP::patch('BusinessPartners', $id, $businessPartners);
             return redirect()->back()->with('success', 'Business Partner ' . $BusinessPartners['CardCode'] . ' updated successfully.');
         } catch (\Exception $e) {
             return $e->getMessage();
@@ -317,7 +302,7 @@ class BusinessPartnerMasterController extends Controller
     {
         return $id;
         try {
-            $BusinessPartners = $this->sapService->delete('BusinessPartners', $id);
+            $BusinessPartners = SAP::delete('BusinessPartners', $id);
             return redirect()->back()->with('success', 'Business Partner ' . $BusinessPartners['CardCode'] . ' deleted successfully.');
         } catch (\Exception $e) {
             return $e->getMessage();

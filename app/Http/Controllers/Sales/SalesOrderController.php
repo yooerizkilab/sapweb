@@ -3,23 +3,17 @@
 namespace App\Http\Controllers\Sales;
 
 use App\Http\Controllers\Controller;
-use App\Services\SAPServices;
+use App\Services\SAP\Facades\SAP;
 use Illuminate\Http\Request;
 
 class SalesOrderController extends Controller
 {
     /*
-    * @var $sapService
-    */
-    protected $sapService;
-
-    /*
     * Create a new controller instance.
     */
-    public function __construct(SAPServices $sapService)
+    public function __construct()
     {
         $this->middleware('auth');
-        $this->sapService = $sapService;
     }
 
     /**
@@ -33,7 +27,7 @@ class SalesOrderController extends Controller
                 // '$filter' => "DocDate ge datetime'" . date('Y-01-01T00:00:00') . "' and DocDate le datetime'" . date('Y-12-31T23:59:59') . "'",
                 '$orderby' => 'CreationDate desc'
             ];
-            $orders = $this->sapService->get('Orders', $paramsOrders);
+            $orders = SAP::get('Orders', $paramsOrders);
             return view('sales.order.index', compact('orders'));
         } catch (\Exception $e) {
             return $e->getMessage();
@@ -73,15 +67,15 @@ class SalesOrderController extends Controller
             $paramsOrders = [
                 '$select' => 'DocEntry,DocNum,DocType,DocDate,DocDueDate,CardCode,CardName,Address,NumAtCard,VatSum,DocTotal,Comments,PaymentGroupCode,SalesPersonCode,DocumentStatus,DocumentLines',
             ];
-            $Orders = $this->sapService->getById('Orders', $id, $paramsOrders);
+            $Orders = SAP::getById('Orders', $id, $paramsOrders);
             $paramsPaymentTermsTypes = [
                 '$select' => 'GroupNumber,PaymentTermsGroupName',
             ];
-            $PaymentTermsTypes = $this->sapService->getById('PaymentTermsTypes', $Orders['PaymentGroupCode'], $paramsPaymentTermsTypes);
+            $PaymentTermsTypes = SAP::getById('PaymentTermsTypes', $Orders['PaymentGroupCode'], $paramsPaymentTermsTypes);
             $paramsSalesPersons = [
                 '$select' => 'SalesEmployeeCode,SalesEmployeeName',
             ];
-            $SalesPersons = $this->sapService->getById('SalesPersons', $Orders['SalesPersonCode'], $paramsSalesPersons);
+            $SalesPersons = SAP::getById('SalesPersons', $Orders['SalesPersonCode'], $paramsSalesPersons);
             return $Orders;
             return view('sales.order.show', compact('Orders', 'PaymentTermsTypes', 'SalesPersons'));
         } catch (\Exception $e) {

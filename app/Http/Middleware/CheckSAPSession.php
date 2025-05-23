@@ -18,7 +18,7 @@ class CheckSAPSession
     public function handle(Request $request, Closure $next): Response
     {
         $companyDB = session('sap_company_db');
-        $cacheKey = 'sap_session_' . Auth::id() . '_' . $companyDB;
+        $cacheKey = 'sap_' . Auth::id() . '_' . $companyDB;
 
         if (Cache::has($cacheKey)) {
             // Refresh session SAP jika ada aktivitas

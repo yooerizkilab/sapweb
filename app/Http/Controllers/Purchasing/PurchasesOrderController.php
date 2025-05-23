@@ -3,23 +3,17 @@
 namespace App\Http\Controllers\Purchasing;
 
 use App\Http\Controllers\Controller;
-use App\Services\SAPServices;
+use App\Services\SAP\Facades\SAP;
 use Illuminate\Http\Request;
 
 class PurchasesOrderController extends Controller
 {
     /*
-    * @var $sapService
-    */
-    protected $sapService;
-
-    /*
     * Create a new controller instance.
     */
-    public function __construct(SAPServices $sapService)
+    public function __construct()
     {
         $this->middleware('auth');
-        $this->sapService = $sapService;
     }
 
     /**
@@ -33,7 +27,7 @@ class PurchasesOrderController extends Controller
                 // '$filter' => "CreationDate ge datetime'" . date('Y-01-01T00:00:00') . "' and CreationDate le datetime'" . date('Y-12-31T23:59:59') . "'",
                 '$orderby' => 'CreationDate desc'
             ];
-            $purchasesOrders = $this->sapService->get('PurchaseOrders', $paramsPurchasesOrder);
+            $purchasesOrders = SAP::get('PurchaseOrders', $paramsPurchasesOrder);
             return view('purchasing.purchases-order.index', compact('purchasesOrders'));
         } catch (\Exception $e) {
             return $e->getMessage();

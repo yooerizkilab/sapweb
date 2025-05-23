@@ -3,23 +3,17 @@
 namespace App\Http\Controllers\Purchasing;
 
 use App\Http\Controllers\Controller;
-use App\Services\SAPServices;
+use App\Services\SAP\Facades\SAP;
 use Illuminate\Http\Request;
 
 class GoodsReceiptPOController extends Controller
 {
     /*
-    * @var $sapService
-    */
-    protected $sapService;
-
-    /*
     * Create a new controller instance.
     */
-    public function __construct(SAPServices $sapService)
+    public function __construct()
     {
         $this->middleware('auth');
-        $this->sapService = $sapService;
     }
 
     /**
@@ -32,7 +26,7 @@ class GoodsReceiptPOController extends Controller
                 '$select' => 'DocEntry,DocNum,DocType,DocDate,CardCode,CardName,DocumentStatus',
                 '$orderby' => 'CreationDate desc'
             ];
-            $goodsReceiptPOs = $this->sapService->get('PurchaseDeliveryNotes', $paramsGoodsReceiptPO);
+            $goodsReceiptPOs = SAP::get('PurchaseDeliveryNotes', $paramsGoodsReceiptPO);
             return view('purchasing.goods-receipt-po.index', compact('goodsReceiptPOs'));
         } catch (\Exception $e) {
             return $e->getMessage();
