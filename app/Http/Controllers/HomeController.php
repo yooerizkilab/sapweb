@@ -24,12 +24,16 @@ class HomeController extends Controller
      */
     public function index()
     {
+        // return session('sap_session_id');
+
         $users = User::count();
 
         $widget = [
             'users' => $users,
-            //...
+            'sap' => session('sap_session_id'),
         ];
+
+        // return $widget;
 
         return view('home', compact('widget'));
     }
