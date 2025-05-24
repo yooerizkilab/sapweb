@@ -221,7 +221,7 @@ class SalesQuotationController extends Controller
     {
         try {
             $paramsQuotation = [
-                // '$select' => 'DocEntry,DocNum,DocType,DocDate,CardCode,CardName,DocTotal,DocumentStatus',  
+                '$select' => 'DocEntry,DocNum,DocType,DocDate,DocDueDate,CardCode,CardName,Address,PeriodIndicator,NumAtCard,VatSum,DocTotal,Comments,PaymentGroupCode,SalesPersonCode,DocumentStatus,DocumentLines',
             ];
             $quotation = SAP::getById('Quotations', $id, $paramsQuotation);
             $paramsSalesPersons = [

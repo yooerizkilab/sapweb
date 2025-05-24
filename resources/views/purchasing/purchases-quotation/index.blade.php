@@ -1,37 +1,43 @@
 @extends('layouts.admin', [
-    'title' => 'Purchases Quotation'
+    'title' => 'Purchases Quotation',
 ])
 
 @push('css')
-
 @endpush
 
 @section('main-content')
-
-<div class="card shadow mb-4">
-    <div class="card-header py-3 d-flex justify-content-between align-items-center flex-wrap">
-        <h6 class="m-0 font-weight-bold text-primary">List Purchases Quotation</h6>
-        <a href="{{ route('purchases-quotation.create') }}" class="btn btn-primary btn-md mr-2">
-            <i class="fas fa-cart-plus"></i> 
-            Add Purchases Quotation
-        </a>
-    </div>
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                <thead class="thead-light">
-                    <tr class="text-center">
-                        <th width="5%">No</th>
-                        <th>Document No</th>
-                        <th>Type</th>
-                        <th width="15%">Document Date</th>
-                        <th>Requested By</th>
-                        <th>Status</th>
-                        <th width="15%">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {{-- @foreach($purchasesQuotations as $purchasesQuotation)
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center flex-wrap">
+            <h6 class="m-0 font-weight-bold text-primary">List Purchases Quotation</h6>
+            <a href="{{ route('purchases-quotation.create') }}" class="btn btn-primary btn-md mr-2">
+                <i class="fas fa-cart-plus"></i>
+                Add Purchases Quotation
+            </a>
+        </div>
+        <div class="card-body">
+            <!-- Spinner -->
+            <div id="loading-spinner" style="text-align: center; padding: 50px;">
+                <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                    <span class="sr-only">Loading...</span>
+                </div>
+                <p>Loading data...</p>
+            </div>
+            <div id="main-content" style="display: none;">
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                        <thead class="thead-light">
+                            <tr class="text-center">
+                                <th width="5%">No</th>
+                                <th>Document No</th>
+                                <th>Type</th>
+                                <th width="15%">Document Date</th>
+                                <th>Requested By</th>
+                                <th>Status</th>
+                                <th width="15%">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{-- @foreach ($purchasesQuotations as $purchasesQuotation)
                     <tr>
                         <td class="text-center">{{ $loop->iteration }}</td>
                         <td>{{ $purchasesQuotation['DocNum'] }}</td>
@@ -51,20 +57,27 @@
                         </td>
                     </tr>
                     @endforeach --}}
-                </tbody>
-            </table>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
-</div>
-
 @endsection
 
 @push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Hide spinner and show main content after page loads
+            document.getElementById('loading-spinner').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
 
-<script>
-    $(document).ready(function () {
-        $('#dataTable').DataTable();
-    });
-</script>
-
+            // Initialize DataTable if table exists
+            if (document.getElementById('dataTable')) {
+                $('#dataTable').DataTable({
+                    responsive: true
+                });
+            }
+        });
+    </script>
 @endpush

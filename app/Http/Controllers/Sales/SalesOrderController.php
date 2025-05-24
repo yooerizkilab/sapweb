@@ -65,19 +65,36 @@ class SalesOrderController extends Controller
     {
         try {
             $paramsOrders = [
-                '$select' => 'DocEntry,DocNum,DocType,DocDate,DocDueDate,CardCode,CardName,Address,NumAtCard,VatSum,DocTotal,Comments,PaymentGroupCode,SalesPersonCode,DocumentStatus,DocumentLines',
+                '$select' => 'DocEntry,DocNum,DocType,DocDate,DocDueDate,CardCode,CardName,Address,PeriodIndicator,NumAtCard,VatSum,DocTotal,Comments,PaymentGroupCode,SalesPersonCode,DocumentStatus,DocumentLines',
             ];
-            $Orders = SAP::getById('Orders', $id, $paramsOrders);
+            $orders = SAP::getById('Orders', $id, $paramsOrders);
             $paramsPaymentTermsTypes = [
                 '$select' => 'GroupNumber,PaymentTermsGroupName',
             ];
-            $PaymentTermsTypes = SAP::getById('PaymentTermsTypes', $Orders['PaymentGroupCode'], $paramsPaymentTermsTypes);
+            $paymentTermsTypes = SAP::getById('PaymentTermsTypes', $orders['PaymentGroupCode'], $paramsPaymentTermsTypes);
             $paramsSalesPersons = [
                 '$select' => 'SalesEmployeeCode,SalesEmployeeName',
             ];
-            $SalesPersons = SAP::getById('SalesPersons', $Orders['SalesPersonCode'], $paramsSalesPersons);
-            return $Orders;
-            return view('sales.order.show', compact('Orders', 'PaymentTermsTypes', 'SalesPersons'));
+            $salesPersons = SAP::getById('SalesPersons', $orders['SalesPersonCode'], $paramsSalesPersons);
+            // Pastikan DocumentLines ada sebelum mengambil AccountCode
+            $coaGroup = isset($orders['DocumentLines'])
+                ? array_unique(array_column($orders['DocumentLines'], 'AccountCode'))
+                : [];
+
+            if (!empty($coaGroup)) {
+                $filter = count($coaGroup) === 1
+                    ? "Code eq '{$coaGroup[0]}'"
+                    : implode(' or ', array_map(fn($code) => "Code eq '{$code}'", $coaGroup));
+
+                $chartOfAccounts = SAP::get('ChartOfAccounts', [
+                    '$select' => 'Code,Name',
+                    '$filter' => $filter
+                ]);
+            } else {
+                $chartOfAccounts = [];
+            }
+
+            return view('sales.order.show', compact('orders', 'paymentTermsTypes', 'salesPersons', 'chartOfAccounts'));
         } catch (\Exception $e) {
             return $e->getMessage();
         }
